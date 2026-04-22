@@ -356,81 +356,95 @@ input:focus,select:focus,textarea:focus{border-color:rgba(200,169,110,0.35)}
 </div>
 
 <script type="module">
-    // 1. Supabase 설정 (본인 정보를 '' 사이에 꼭 넣으세요!)
-const SUPABASE_URL = 'https://guuuxzdxrswjzpusfjqw.supabase.co'; 
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd1dXV4emR4cnN3anpwdXNmanF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4Mjc2MTcsImV4cCI6MjA5MjQwMzYxN30.jbGQgPf1GH_RfEwU1w-HxjfpJyS1GWPEnS0Dg8GVck4';
+    // 1. Supabase 설정
+    const SUPABASE_URL = 'https://guuuxzdxrswjzpusfjqw.supabase.co'; 
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd1dXV4emR4cnN3anpwdXNmanF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4Mjc2MTcsImV4cCI6MjA5MjQwMzYxN30.jbGQgPf1GH_RfEwU1w-HxjfpJyS1GWPEnS0Dg8GVck4';
 
-    // Supabase 초기화
     const { createClient } = supabase;
     const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    document.addEventListener('DOMContentLoaded', () => {
-        
-        // [로그인 버튼 클릭 시 실행되는 코드]
-        const loginBtn = document.getElementById('login-btn');
-        if (loginBtn) {
-            loginBtn.addEventListener('click', async () => {
-                const combinedNick = document.getElementById('login-nick').value; // 예: 은지#1234
-                const password = document.getElementById('login-pw').value;
+    // [중요!] 은지님의 HTML 버튼이 doLogin()을 찾으므로, 이를 정의해줍니다.
+    window.doLogin = async () => {
+        const combinedNick = document.getElementById('login-nick').value; 
+        const password = document.getElementById('login-pw').value;
 
-                if (!combinedNick.includes('#')) return alert("닉네임#태그 형식으로 입력해주세요!");
-                const [nickname, tag] = combinedNick.split('#');
-                const email = `user${tag}@test.com`; // 우리가 만든 가상 이메일 형식
+        if (!combinedNick.includes('#')) return alert("닉네임#태그 형식으로 입력해주세요!");
+        const [nickname, tag] = combinedNick.split('#');
+        const email = `user${tag}@test.com`; 
 
-                try {
-                    const { data, error } = await _supabase.auth.signInWithPassword({
-                        email: email,
-                        password: password
-                    });
-
-                    if (error) throw error;
-
-                    alert(`${nickname}님, 환영합니다!`);
-                    // 로그인이 성공하면 메인 화면으로 전환하는 함수 (은지님이 만든 함수 이름 확인)
-                    if (window.switchTab) window.switchTab('main'); 
-
-                } catch (err) {
-                    alert("로그인 실패: " + err.message);
-                }
+        try {
+            const { data, error } = await _supabase.auth.signInWithPassword({
+                email: email,
+                password: password
             });
-        }
 
-        // [친구 추가 버튼 클릭 시 실행되는 코드]
-        const addFriendBtn = document.getElementById('add-friend-btn'); // HTML에 이 ID의 버튼이 있어야 합니다
-        if (addFriendBtn) {
-            addFriendBtn.addEventListener('click', async () => {
-                const friendInput = document.getElementById('friend-nickname-input').value;
-                const [fNick, fTag] = friendInput.split('#');
-                
-                if (!fTag) return alert("친구의 닉네임#태그를 입력해주세요!");
+            if (error) throw error;
+
+            alert(`${nickname}님, 환영합니다!`);
+            
+            // 로그인 성공 시 메인 화면으로 전환
+            document.getElementById('auth-screen').style.display = 'none';
+            document.getElementById('main-app').style.display = 'block';
+
+        } catch (err) {
+            alert("로그인 실패: " + err.message);
+        }
+    };
+
+    // [회원가입 기능]
+    document.addEventListener('DOMContentLoaded', () => {
+        const realSignupBtn = document.getElementById('real-signup-btn');
+        if (realSignupBtn) {
+            realSignupBtn.addEventListener('click', async () => {
+                const nickname = document.getElementById('signup-nickname').value;
+                const pw = document.getElementById('signup-password').value;
+                const pwConfirm = document.getElementById('signup-password-confirm').value;
+
+                if (!nickname) return alert("닉네임을 입력해주세요.");
+                if (pw !== pwConfirm) return alert("비밀번호가 일치하지 않습니다.");
+
+                const randomTag = Math.floor(1000 + Math.random() * 9000).toString();
+                const email = `user${randomTag}@test.com`;
 
                 try {
-                    // 1. 친구 ID 찾기
-                    const { data: friendUser, error: findError } = await _supabase
+                    const { data, error: authError } = await _supabase.auth.signUp({
+                        email: email,
+                        password: pw,
+                        options: { data: { nickname: nickname, tag: randomTag } }
+                    });
+                    if (authError) throw authError;
+
+                    const { error: dbError } = await _supabase
                         .from('users')
-                        .select('id')
-                        .eq('nickname', fNick)
-                        .eq('tag', fTag)
-                        .single();
+                        .insert([{ nickname: nickname, tag: randomTag }]);
+                    if (dbError) throw dbError;
 
-                    if (!friendUser) throw new Error("친구를 찾을 수 없습니다.");
-
-                    const myId = (await _supabase.auth.getUser()).data.user.id;
-
-                    // 2. friendships 테이블에 저장
-                    const { error: insertError } = await _supabase
-                        .from('friendships') 
-                        .insert([{ user_id: myId, friend_id: friendUser.id }]);
-
-                    if (insertError) throw insertError;
-                    alert(`${fNick}님과 친구가 되었습니다!`);
-
+                    alert(`가입 완료! 닉네임: ${nickname}#${randomTag}\n이 정보를 기억해주세요!`);
+                    location.reload(); // 새로고침해서 로그인 화면으로
                 } catch (err) {
-                    alert("친구 추가 실패: " + err.message);
+                    alert("가입 오류: " + err.message);
                 }
             });
         }
     });
+
+    // 탭 전환용 함수
+    window.switchTab = (type) => {
+        const loginForm = document.getElementById('login-form');
+        const signupForm = document.getElementById('signup-form');
+        const tabs = document.querySelectorAll('.auth-tab-btn');
+        if (type === 'signup') {
+            loginForm.style.display = 'none';
+            signupForm.style.display = 'block';
+            tabs[0].classList.remove('active');
+            tabs[1].classList.add('active');
+        } else {
+            loginForm.style.display = 'block';
+            signupForm.style.display = 'none';
+            tabs[0].classList.add('active');
+            tabs[1].classList.remove('active');
+        }
+    };
 </script>
 </body>
 </html>
