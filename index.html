@@ -357,12 +357,12 @@ input:focus,select:focus,textarea:focus{border-color:rgba(200,169,110,0.35)}
 
 <script type="module">
     // 1. Supabase 설정 (본인 정보를 '' 사이에 꼭 넣으세요!)
-   // 1048번 라인 근처를 이렇게 수정하세요!
 const SUPABASE_URL = 'https://guuuxzdxrswjzpusfjqw.supabase.co'; 
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd1dXV4emR4cnN3anpwdXNmanF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4Mjc2MTcsImV4cCI6MjA5MjQwMzYxN30.jbGQgPf1GH_RfEwU1w-HxjfpJyS1GWPEnS0Dg8GVck4';
 
-    // Supabase 클라이언트 초기화
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    // Supabase 초기화
+    const { createClient } = supabase;
+    const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
     document.addEventListener('DOMContentLoaded', () => {
         const realSignupBtn = document.getElementById('real-signup-btn');
@@ -377,28 +377,28 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
                 if (pw.length < 6) return alert("비밀번호는 6자 이상이어야 합니다.");
                 if (pw !== pwConfirm) return alert("비밀번호 확인이 일치하지 않습니다.");
 
-                // 랜덤 숫자 4자리 생성
+                // 랜덤 태그 생성
                 const randomTag = Math.floor(1000 + Math.random() * 9000).toString();
 
+                // [여기입니다!] 한글 오류를 방지하는 안전한 이메일 생성 코드
+                const email = `user${randomTag}${Date.now()}@test.com`;
+
                 try {
-                    // [실제 데이터 저장 로직]
-                    // A. Auth 등록 (로그인 계정 생성)
-                    const { data: authData, error: authError } = await supabaseClient.auth.signUp({
-                        email: `${nickname}_${randomTag}@escapelog.app`,
+                    // A. Auth 가입 (이메일 인증 꺼져있어야 함)
+                    const { data, error: authError } = await _supabase.auth.signUp({
+                        email: email,
                         password: pw,
-                        options: {
-                            data: { nickname: nickname, tag: randomTag }
-                        }
+                        options: { data: { nickname: nickname, tag: randomTag } }
                     });
                     if (authError) throw authError;
 
-                    // B. 테이블 저장 (만들어두신 'users' 테이블에 기록)
-                    const { error: dbError } = await supabaseClient
+                    // B. 테이블 저장
+                    const { error: dbError } = await _supabase
                         .from('users') 
                         .insert([{ nickname: nickname, tag: randomTag }]);
                     if (dbError) throw dbError;
 
-                    alert(`가입 완료!\n닉네임: ${nickname}\n고유 태그: #${randomTag}\n\n로그인 시 이 태그를 기억해 주세요!`);
+                    alert(`가입 완료!\n닉네임: ${nickname}\n고유 태그: #${randomTag}`);
                     
                     window.switchTab('login');
                     document.getElementById('login-nick').value = `${nickname}#${randomTag}`;
