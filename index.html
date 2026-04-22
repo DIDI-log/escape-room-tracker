@@ -356,36 +356,32 @@ input:focus,select:focus,textarea:focus{border-color:rgba(200,169,110,0.35)}
 </div>
 
 <script type="module">
-    // 1. Supabase 접속 정보 (본인의 실제 정보를 '' 사이에 넣으세요)
     const SUPABASE_URL = 'https://본인의아이디.supabase.co'; 
     const SUPABASE_KEY = '본인의-anon-public-키';
 
-    // 2. 화면 전환 및 초기 설정
+    // 탭 전환 함수 (기존 HTML에서 onclick으로 호출하고 있음)
+    window.switchTab = (type) => {
+        const loginForm = document.getElementById('login-form');
+        const signupForm = document.getElementById('signup-form');
+        const tabs = document.querySelectorAll('.auth-tab-btn');
+
+        if (type === 'signup') {
+            loginForm.style.display = 'none';
+            signupForm.style.display = 'block';
+            tabs[0].classList.remove('active');
+            tabs[1].classList.add('active');
+        } else {
+            loginForm.style.display = 'block';
+            signupForm.style.display = 'none';
+            tabs[0].classList.add('active');
+            tabs[1].classList.remove('active');
+        }
+    };
+
     document.addEventListener('DOMContentLoaded', () => {
-        const loginScreen = document.getElementById('login-screen');
-        const signupScreen = document.getElementById('signup-screen');
-
-        // 회원가입 버튼 클릭 시 창 전환
-        // (HTML에 <button id="signup-btn">이 있는지 확인해 주세요)
-        const goToSignup = document.getElementById('signup-btn');
-        if (goToSignup) {
-            goToSignup.addEventListener('click', () => {
-                loginScreen.classList.add('hidden');
-                signupScreen.classList.remove('hidden');
-            });
-        }
-
-        // 로그인으로 돌아가기 버튼 클릭 시
-        const backToLogin = document.getElementById('back-to-login');
-        if (backToLogin) {
-            backToLogin.addEventListener('click', () => {
-                signupScreen.classList.add('hidden');
-                loginScreen.classList.remove('hidden');
-            });
-        }
+        // 만약 추가적인 클릭 이벤트가 필요하다면 여기에 작성합니다.
+        console.log("페이지 준비 완료");
     });
-
-    // 이 아래에 기존의 로그인 및 가입 로직을 그대로 두시면 됩니다.
 </script>
 </body>
 </html>
