@@ -5,30 +5,26 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>방탈출 기록부</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Noto Sans KR',sans-serif;background:#0a0a10;color:#f0ede8;min-height:100vh;overflow-x:hidden}
-:root{
-  --accent:#c8a96e;--accent2:#7c6ef7;--surface:#141420;--surface2:#1c1c2e;--surface3:#242438;
-  --border:rgba(200,169,110,0.15);--border2:rgba(124,110,247,0.2);
-  --success:#4caf7d;--fail:#e05c5c;--muted:rgba(240,237,232,0.4);
-  --mono:'Space Mono',monospace;
-}
+:root{--accent:#c8a96e;--accent2:#7c6ef7;--surface:#141420;--surface2:#1c1c2e;--surface3:#242438;--border:rgba(200,169,110,0.15);--border2:rgba(124,110,247,0.2);--success:#4caf7d;--fail:#e05c5c;--muted:rgba(240,237,232,0.4);--mono:'Space Mono',monospace;}
 .app{max-width:420px;margin:0 auto;padding-bottom:90px}
 .nav{display:flex;background:rgba(10,10,16,0.95);border-bottom:0.5px solid var(--border);position:sticky;top:0;z-index:50;backdrop-filter:blur(12px)}
-.nav-btn{flex:1;padding:13px 0 11px;font-size:10px;color:var(--muted);background:none;border:none;cursor:pointer;font-family:'Noto Sans KR',sans-serif;display:flex;flex-direction:column;align-items:center;gap:3px;transition:color 0.2s;letter-spacing:0.3px}
+.nav-btn{flex:1;padding:13px 0 11px;font-size:10px;color:var(--muted);background:none;border:none;cursor:pointer;font-family:'Noto Sans KR',sans-serif;display:flex;flex-direction:column;align-items:center;gap:3px;transition:color 0.2s}
 .nav-btn .icon{font-size:17px}
 .nav-btn.active{color:var(--accent)}
 .page{display:none}.page.active{display:block}
 .hero{padding:20px 16px 16px;position:relative;overflow:hidden}
 .hero::after{content:'🔐';position:absolute;right:-10px;top:-10px;font-size:100px;opacity:0.04;transform:rotate(-15deg)}
 .hero-label{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
-.hero-title{font-size:22px;font-weight:900;letter-spacing:-0.5px;line-height:1.2}
+.hero-title{font-size:22px;font-weight:900;letter-spacing:-0.5px}
 .hero-title span{color:var(--accent)}
 .stats-bar{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:0 16px 16px}
 .stat{background:var(--surface);border:0.5px solid var(--border);border-radius:12px;padding:12px;text-align:center}
 .stat-num{font-family:var(--mono);font-size:20px;font-weight:700;color:var(--accent)}
-.stat-label{font-size:10px;color:var(--muted);margin-top:3px;letter-spacing:0.3px}
+.stat-label{font-size:10px;color:var(--muted);margin-top:3px}
 .search-wrap{padding:0 16px 8px;position:relative}
 .search-icon{position:absolute;left:28px;top:50%;transform:translateY(-50%);font-size:13px;opacity:0.35;pointer-events:none}
 .search-wrap input{width:100%;background:var(--surface2);border:0.5px solid rgba(255,255,255,0.08);border-radius:12px;padding:11px 14px 11px 38px;color:#f0ede8;font-size:14px;font-family:'Noto Sans KR',sans-serif;outline:none}
@@ -53,15 +49,14 @@ body{font-family:'Noto Sans KR',sans-serif;background:#0a0a10;color:#f0ede8;min-
 .tag{font-size:10px;background:rgba(124,110,247,0.12);color:#a59cf7;padding:2px 8px;border-radius:10px;border:0.5px solid rgba(124,110,247,0.25)}
 .stars{color:var(--accent);font-size:12px;margin-top:5px;padding-left:6px;font-family:var(--mono)}
 .public-badge{font-size:10px;background:rgba(200,169,110,0.1);color:var(--accent);padding:2px 8px;border-radius:10px;border:0.5px solid var(--border)}
-.reason-badge{font-size:10px;background:rgba(224,92,92,0.1);color:#ff9a9a;padding:2px 8px;border-radius:8px;border:0.5px solid rgba(224,92,92,0.2);margin-top:6px;display:inline-block;margin-left:6px}
+.poster-thumb{width:100%;height:120px;object-fit:cover;border-radius:10px;margin-top:10px}
 .sec{font-size:10px;font-weight:500;color:var(--muted);padding:14px 16px 8px;letter-spacing:1.5px;text-transform:uppercase;font-family:var(--mono)}
-/* RANKING */
 .rank-hero{padding:20px 16px 14px;border-bottom:0.5px solid var(--border)}
 .rank-hero-label{font-family:var(--mono);font-size:10px;color:var(--accent);letter-spacing:2px;margin-bottom:6px}
 .rank-hero-title{font-size:20px;font-weight:900;letter-spacing:-0.5px}
 .rank-hero-sub{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.5}
 .rank-list{padding:0 16px;display:flex;flex-direction:column;gap:10px}
-.rank-card{background:var(--surface);border:0.5px solid var(--border);border-radius:16px;padding:14px 16px;position:relative;overflow:hidden;transition:border-color 0.2s}
+.rank-card{background:var(--surface);border:0.5px solid var(--border);border-radius:16px;padding:14px 16px;position:relative;overflow:hidden}
 .rank-card.top1{border-color:rgba(200,169,110,0.45);background:linear-gradient(135deg,rgba(200,169,110,0.06) 0%,var(--surface) 60%)}
 .rank-card.top2{border-color:rgba(192,192,192,0.25)}
 .rank-card.top3{border-color:rgba(205,127,50,0.25)}
@@ -73,27 +68,21 @@ body{font-family:'Noto Sans KR',sans-serif;background:#0a0a10;color:#f0ede8;min-
 .rank-stars{color:var(--accent);font-family:var(--mono);font-size:13px}
 .rank-count{font-size:10px;color:var(--muted);font-family:var(--mono);margin-top:3px}
 .rank-avg{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--accent);line-height:1}
-.no-data{text-align:center;padding:48px 20px;color:var(--muted);font-size:13px;line-height:1.8}
-/* MAP */
-.map-container{height:200px;background:var(--surface2);margin:0 16px;border-radius:16px;overflow:hidden;border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px}
+.map-container{height:200px;background:var(--surface2);margin:0 16px;border-radius:16px;border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px}
 .map-btn{padding:10px 20px;background:var(--accent);color:#0a0a10;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;margin-top:4px}
 .pin-list{padding:0 16px;display:flex;flex-direction:column;gap:8px}
 .pin-card{background:var(--surface);border:0.5px solid var(--border);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:12px}
 .pin-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
-.pin-dot.s{background:var(--success)}
-.pin-dot.f{background:var(--fail)}
+.pin-dot.s{background:var(--success)}.pin-dot.f{background:var(--fail)}
 .pin-info{flex:1;min-width:0}
 .pin-name{font-size:14px;font-weight:500}
 .pin-addr{font-size:11px;color:var(--muted);margin-top:2px}
-/* FRIENDS */
 .friend-list{padding:0 16px;display:flex;flex-direction:column;gap:8px}
 .friend-card{background:var(--surface);border:0.5px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:14px}
 .avatar{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;flex-shrink:0}
 .friend-meta{flex:1}
 .friend-name{font-size:14px;font-weight:500}
 .friend-sub{font-size:11px;color:var(--muted);margin-top:3px}
-.friend-stat{font-family:var(--mono);font-size:16px;color:var(--accent);font-weight:700}
-/* CHART */
 .chart-wrap{padding:0 16px}
 .chart-card{background:var(--surface);border:0.5px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px}
 .chart-title{font-size:10px;font-weight:500;margin-bottom:14px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;font-family:var(--mono)}
@@ -106,16 +95,14 @@ body{font-family:'Noto Sans KR',sans-serif;background:#0a0a10;color:#f0ede8;min-
 .genre-item{background:var(--surface2);border-radius:10px;padding:10px 12px}
 .genre-name{font-size:11px;color:var(--muted)}
 .genre-count{font-size:22px;font-weight:700;color:var(--accent2);font-family:var(--mono);margin-top:2px}
-/* FAB */
 .fab{position:fixed;bottom:24px;right:50%;transform:translateX(50%);background:var(--accent);color:#0a0a10;border:none;border-radius:28px;padding:14px 28px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;box-shadow:0 4px 32px rgba(200,169,110,0.28);font-family:'Noto Sans KR',sans-serif;max-width:380px;width:calc(100% - 40px);justify-content:center;z-index:40}
-/* MODAL */
 .overlay{position:fixed;inset:0;background:rgba(10,10,16,0.9);display:flex;align-items:flex-end;justify-content:center;z-index:200;backdrop-filter:blur(8px)}
 .sheet{background:var(--surface);border-radius:24px 24px 0 0;padding:24px 20px 44px;width:100%;max-width:420px;max-height:92vh;overflow-y:auto;border-top:0.5px solid rgba(255,255,255,0.07)}
 .handle{width:36px;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;margin:0 auto 22px}
 .modal-title{font-size:18px;font-weight:900;margin-bottom:4px;letter-spacing:-0.3px}
 .modal-sub{font-size:12px;color:var(--muted);margin-bottom:20px;line-height:1.5}
 label{display:block;font-size:10px;color:var(--muted);margin-bottom:5px;margin-top:16px;letter-spacing:0.8px;text-transform:uppercase;font-family:var(--mono)}
-input[type=text],input[type=date],select,textarea{width:100%;background:var(--surface2);border:0.5px solid rgba(255,255,255,0.08);border-radius:12px;padding:11px 14px;color:#f0ede8;font-size:14px;font-family:'Noto Sans KR',sans-serif;outline:none;transition:border-color 0.2s}
+input[type=text],input[type=date],input[type=password],select,textarea{width:100%;background:var(--surface2);border:0.5px solid rgba(255,255,255,0.08);border-radius:12px;padding:11px 14px;color:#f0ede8;font-size:14px;font-family:'Noto Sans KR',sans-serif;outline:none;transition:border-color 0.2s}
 input:focus,select:focus,textarea:focus{border-color:rgba(200,169,110,0.35)}
 .toggle-row{display:flex;gap:8px;margin-top:6px}
 .tbtn{flex:1;padding:11px;border-radius:12px;border:0.5px solid rgba(255,255,255,0.08);background:var(--surface2);color:var(--muted);font-size:13px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all 0.15s}
@@ -137,7 +124,6 @@ input:focus,select:focus,textarea:focus{border-color:rgba(200,169,110,0.35)}
 .friend-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 .fc{padding:7px 14px;border-radius:20px;border:0.5px solid rgba(255,255,255,0.08);background:var(--surface2);font-size:12px;color:var(--muted);cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all 0.15s}
 .fc.sel{background:rgba(124,110,247,0.15);border-color:rgba(124,110,247,0.4);color:#c4bfff}
-/* PUBLIC TOGGLE */
 .pub-box{margin-top:18px;background:linear-gradient(135deg,rgba(200,169,110,0.06),rgba(200,169,110,0.02));border:0.5px solid rgba(200,169,110,0.2);border-radius:14px;padding:14px 16px}
 .pub-top{display:flex;justify-content:space-between;align-items:center;cursor:pointer}
 .pub-label{font-size:14px;font-weight:500}
@@ -148,24 +134,80 @@ input:focus,select:focus,textarea:focus{border-color:rgba(200,169,110,0.35)}
 .sw.on::after{transform:translateX(18px)}
 .pub-info{margin-top:10px;font-size:11px;color:var(--muted);line-height:1.7;padding-top:10px;border-top:0.5px solid rgba(255,255,255,0.05)}
 .pub-info b{color:var(--accent);font-weight:500}
-/* LOW STAR BOX */
 .low-box{background:rgba(224,92,92,0.07);border:0.5px solid rgba(224,92,92,0.22);border-radius:12px;padding:12px 14px;margin-top:12px}
 .low-label{font-size:12px;color:var(--fail);margin-bottom:8px;font-weight:500}
-.low-box textarea{margin-top:0;border-color:rgba(224,92,92,0.2)}
-.low-box textarea:focus{border-color:rgba(224,92,92,0.45)}
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.auth-box{background:var(--surface);border:0.5px solid var(--border);border-radius:24px;padding:32px 24px;width:100%;max-width:380px}
+.auth-logo{font-size:36px;text-align:center;margin-bottom:12px}
+.auth-title{font-size:22px;font-weight:900;text-align:center;margin-bottom:4px}
+.auth-sub{font-size:12px;color:var(--muted);text-align:center;margin-bottom:28px;line-height:1.5}
+.auth-tab{display:flex;background:var(--surface2);border-radius:12px;padding:4px;margin-bottom:24px;gap:4px}
+.auth-tab-btn{flex:1;padding:9px;border:none;border-radius:9px;font-size:13px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;color:var(--muted);background:transparent;font-weight:500;transition:all 0.15s}
+.auth-tab-btn.active{background:var(--surface);color:#f0ede8;box-shadow:0 1px 4px rgba(0,0,0,0.3)}
+.nick-preview{font-family:var(--mono);font-size:18px;color:var(--accent);text-align:center;padding:12px;background:var(--surface2);border-radius:10px;margin-top:8px;letter-spacing:1px}
+.err-msg{font-size:12px;color:var(--fail);margin-top:8px;text-align:center}
+.ok-msg{font-size:12px;color:var(--success);margin-top:8px;text-align:center}
+.profile-card{margin:16px;background:var(--surface);border:0.5px solid var(--border);border-radius:16px;padding:20px;display:flex;align-items:center;gap:16px}
+.profile-avatar{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;flex-shrink:0}
+.profile-name{font-size:16px;font-weight:700}
+.profile-tag{font-family:var(--mono);font-size:13px;color:var(--accent);margin-top:3px}
+.logout-btn{margin:0 16px 16px;width:calc(100% - 32px);padding:12px;background:rgba(224,92,92,0.08);color:var(--fail);border:0.5px solid rgba(224,92,92,0.2);border-radius:12px;font-size:13px;cursor:pointer;font-family:'Noto Sans KR',sans-serif}
+.poster-upload{margin-top:8px;border:1.5px dashed rgba(255,255,255,0.12);border-radius:12px;padding:20px;text-align:center;cursor:pointer;transition:border-color 0.2s;position:relative}
+.poster-upload:hover{border-color:rgba(200,169,110,0.4)}
+.poster-upload input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.poster-preview-img{width:100%;border-radius:10px;margin-top:8px;max-height:200px;object-fit:cover}
+.friend-search-row{display:flex;gap:8px;padding:0 16px;margin-bottom:8px}
+.search-result{padding:0 16px;display:flex;flex-direction:column;gap:8px}
+.search-result-card{background:var(--surface2);border:0.5px solid var(--border);border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between}
+.add-friend-btn{padding:7px 14px;background:rgba(124,110,247,0.2);color:#c4bfff;border:0.5px solid var(--border2);border-radius:10px;font-size:12px;cursor:pointer;font-family:'Noto Sans KR',sans-serif}
+.loading{text-align:center;padding:20px;color:var(--muted);font-size:13px}
 </style>
 </head>
 <body>
+
+<!-- AUTH -->
+<div id="auth-screen" class="auth-wrap">
+  <div class="auth-box">
+    <div class="auth-logo">🔐</div>
+    <div class="auth-title">방탈출 기록부</div>
+    <div class="auth-sub">나만의 탈출 기록을 남기고<br>친구들과 함께 공유해요</div>
+    <div class="auth-tab">
+      <button class="auth-tab-btn active" onclick="switchTab('login')">로그인</button>
+      <button class="auth-tab-btn" onclick="switchTab('signup')">회원가입</button>
+    </div>
+    <div id="login-form">
+      <label>닉네임#태그</label>
+      <input type="text" id="login-nick" placeholder="닉네임#1234"/>
+      <label>비밀번호</label>
+      <input type="password" id="login-pw" placeholder="비밀번호 입력"/>
+      <div id="login-msg"></div>
+      <button class="submit-btn" style="margin-top:16px" onclick="doLogin()">로그인</button>
+    </div>
+    <div id="signup-form" style="display:none">
+      <label>닉네임</label>
+      <input type="text" id="signup-nick" placeholder="원하는 닉네임 입력" oninput="previewTag()"/>
+      <div class="nick-preview" id="nick-preview">닉네임#????</div>
+      <label>비밀번호</label>
+      <input type="password" id="signup-pw" placeholder="비밀번호 (6자 이상)"/>
+      <label>비밀번호 확인</label>
+      <input type="password" id="signup-pw2" placeholder="비밀번호 재입력"/>
+      <div id="signup-msg"></div>
+      <button class="submit-btn" style="margin-top:16px" onclick="doSignup()">가입하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 메인 앱 -->
+<div id="main-app" style="display:none">
 <div class="app">
 <nav class="nav">
   <button class="nav-btn active" onclick="showPage('home',this)"><span class="icon">🏠</span>내 기록</button>
   <button class="nav-btn" onclick="showPage('rank',this)"><span class="icon">🏆</span>랭킹</button>
   <button class="nav-btn" onclick="showPage('map',this)"><span class="icon">📍</span>지도</button>
   <button class="nav-btn" onclick="showPage('friends',this)"><span class="icon">👥</span>친구</button>
-  <button class="nav-btn" onclick="showPage('stats',this)"><span class="icon">📊</span>통계</button>
+  <button class="nav-btn" onclick="showPage('profile',this)"><span class="icon">👤</span>프로필</button>
 </nav>
 
-<!-- HOME -->
 <div id="page-home" class="page active">
   <div class="hero">
     <div class="hero-label">MY ESCAPE LOG</div>
@@ -188,25 +230,23 @@ input:focus,select:focus,textarea:focus{border-color:rgba(200,169,110,0.35)}
     <button class="chip" onclick="setF('5',this)">★ 5점</button>
   </div>
   <div class="sec" id="home-label">최근 기록</div>
-  <div class="records" id="record-list"></div>
+  <div class="records" id="record-list"><div class="loading">불러오는 중...</div></div>
 </div>
 
-<!-- RANKING -->
 <div id="page-rank" class="page">
   <div class="rank-hero">
     <div class="rank-hero-label">COMMUNITY RANKING</div>
     <div class="rank-hero-title">🏆 방탈출 랭킹</div>
-    <div class="rank-hero-sub">🌍 공개된 기록 기준 · 테마명 · 위치 · 별점만 표시<br>개인 날짜 · 친구 · 메모는 절대 공개되지 않아요</div>
+    <div class="rank-hero-sub">공개된 기록 기준 · 테마명 · 위치 · 별점만 표시</div>
   </div>
   <div class="filter-row" style="padding-top:12px">
     <button class="chip active" onclick="setRF('top',this)">⭐ 평점 높은 순</button>
     <button class="chip" onclick="setRF('count',this)">🔥 도전 많은 순</button>
   </div>
   <div class="sec" id="rank-label">랭킹</div>
-  <div class="rank-list" id="rank-list"></div>
+  <div class="rank-list" id="rank-list"><div class="loading">불러오는 중...</div></div>
 </div>
 
-<!-- MAP -->
 <div id="page-map" class="page">
   <div class="sec">방문한 곳</div>
   <div class="map-container" id="map-container">
@@ -220,38 +260,31 @@ input:focus,select:focus,textarea:focus{border-color:rgba(200,169,110,0.35)}
   <div class="pin-list" id="pin-list"></div>
 </div>
 
-<!-- FRIENDS -->
 <div id="page-friends" class="page">
-  <div class="sec">함께한 친구들</div>
-  <div class="friend-list" id="friend-list"></div>
-  <div class="sec" style="margin-top:4px">친구 추가</div>
-  <div style="padding:0 16px;display:flex;gap:8px">
-    <input type="text" id="new-friend" placeholder="친구 이름"/>
-    <button onclick="addFriend()" style="padding:11px 16px;background:rgba(124,110,247,0.18);color:#c4bfff;border:0.5px solid var(--border2);border-radius:12px;font-size:13px;cursor:pointer;font-family:'Noto Sans KR',sans-serif">추가</button>
+  <div class="sec">친구 검색</div>
+  <div class="friend-search-row">
+    <input type="text" id="friend-search" placeholder="닉네임#태그 (예: 디디#1234)" style="flex:1"/>
+    <button onclick="searchFriend()" style="padding:11px 16px;background:rgba(124,110,247,0.18);color:#c4bfff;border:0.5px solid var(--border2);border-radius:12px;font-size:13px;cursor:pointer;font-family:'Noto Sans KR',sans-serif">검색</button>
   </div>
+  <div class="search-result" id="friend-search-result"></div>
+  <div class="sec" style="margin-top:8px">내 친구들</div>
+  <div class="friend-list" id="friend-list"><div class="loading">불러오는 중...</div></div>
 </div>
 
-<!-- STATS -->
-<div id="page-stats" class="page">
+<div id="page-profile" class="page">
+  <div class="sec">내 프로필</div>
+  <div class="profile-card" id="profile-card"></div>
+  <button class="logout-btn" onclick="doLogout()">로그아웃</button>
   <div class="sec">내 통계</div>
   <div class="chart-wrap">
-    <div class="chart-card">
-      <div class="chart-title">월별 기록 (최근 6개월)</div>
-      <div id="month-chart"></div>
-    </div>
-    <div class="chart-card">
-      <div class="chart-title">장르별 도전 수</div>
-      <div class="genre-grid" id="genre-chart"></div>
-    </div>
-    <div class="chart-card">
-      <div class="chart-title">베스트 테마 TOP 3</div>
-      <div id="top-themes"></div>
-    </div>
+    <div class="chart-card"><div class="chart-title">월별 기록 (최근 6개월)</div><div id="month-chart"></div></div>
+    <div class="chart-card"><div class="chart-title">장르별 도전 수</div><div class="genre-grid" id="genre-chart"></div></div>
+    <div class="chart-card"><div class="chart-title">베스트 테마 TOP 3</div><div id="top-themes"></div></div>
   </div>
 </div>
 </div>
-
 <button class="fab" id="main-fab" onclick="openAdd()">＋ 새 기록 추가</button>
+</div>
 
 <!-- ADD MODAL -->
 <div class="overlay" id="add-overlay" style="display:none" onclick="if(event.target===this)closeAdd()">
@@ -269,6 +302,12 @@ input:focus,select:focus,textarea:focus{border-color:rgba(200,169,110,0.35)}
     <button class="loc-btn" onclick="getGPS()">📍 현위치</button>
   </div>
   <div style="font-size:11px;color:var(--muted);margin-top:4px" id="gps-status"></div>
+  <label>포스터 / 인증샷</label>
+  <div class="poster-upload" id="poster-drop">
+    <input type="file" id="poster-file" accept="image/*" onchange="previewPoster(event)"/>
+    <div id="poster-placeholder"><div style="font-size:24px;margin-bottom:6px">🖼</div><div style="font-size:12px;color:var(--muted)">사진을 탭해서 업로드</div></div>
+    <img id="poster-preview-img" class="poster-preview-img" style="display:none"/>
+  </div>
   <label>플레이 날짜</label>
   <input type="date" id="f-date"/>
   <label>결과</label>
@@ -283,36 +322,29 @@ input:focus,select:focus,textarea:focus{border-color:rgba(200,169,110,0.35)}
   <label>장르 태그</label>
   <input type="text" id="f-tags" placeholder="공포, 추리, SF — 쉼표로 구분"/>
   <label>별점</label>
-  <div class="star-row" id="star-row">
+  <div class="star-row">
     <button class="sbtn" data-v="1" onclick="setStar(1)">★</button>
     <button class="sbtn" data-v="2" onclick="setStar(2)">★</button>
     <button class="sbtn" data-v="3" onclick="setStar(3)">★</button>
     <button class="sbtn" data-v="4" onclick="setStar(4)">★</button>
     <button class="sbtn" data-v="5" onclick="setStar(5)">★</button>
   </div>
-  <!-- 2점 이하 사유 (항상 필수) -->
   <div class="low-box" id="low-box" style="display:none">
     <div class="low-label">⚠️ 낮은 별점 사유 필수 입력</div>
-    <textarea id="f-reason" rows="2" placeholder="낮은 점수를 준 이유를 간단히 적어주세요&#10;ex) 힌트 불친절, 장치 오류, 스토리 빈약 등"></textarea>
+    <textarea id="f-reason" rows="2" placeholder="낮은 점수를 준 이유를 간단히 적어주세요"></textarea>
   </div>
   <label>힌트 사용 횟수</label>
   <input type="text" id="f-hint" placeholder="ex) 2회"/>
   <label>메모 (비공개)</label>
   <textarea id="f-memo" rows="3" placeholder="느낀 점, 추천 여부 등 — 나만 볼 수 있어요 🔒"></textarea>
-  <!-- 공개 토글 -->
   <div class="pub-box">
     <div class="pub-top" onclick="togglePublic()">
-      <div>
-        <div class="pub-label">🌍 랭킹에 공개하기</div>
-        <div class="pub-sub">테마명 · 위치 · 별점만 공유돼요</div>
-      </div>
+      <div><div class="pub-label">🌍 랭킹에 공개하기</div><div class="pub-sub">테마명 · 위치 · 별점만 공유돼요</div></div>
       <div class="sw" id="pub-sw"></div>
     </div>
-    <div class="pub-info">
-      공개 정보: <b>테마명, 카페명, 위치, 별점</b><br>
-      비공개 유지: <b>날짜, 친구 목록, 메모, 힌트 횟수</b>
-    </div>
+    <div class="pub-info">공개 정보: <b>테마명, 카페명, 위치, 별점</b><br>비공개 유지: <b>날짜, 친구 목록, 메모, 힌트 횟수</b></div>
   </div>
+  <div id="save-msg"></div>
   <button class="submit-btn" onclick="saveRecord()">기록 저장</button>
   <button class="cancel-btn" onclick="closeAdd()">취소</button>
 </div>
@@ -324,41 +356,112 @@ input:focus,select:focus,textarea:focus{border-color:rgba(200,169,110,0.35)}
 </div>
 
 <script>
-let records=JSON.parse(localStorage.getItem('er_records')||'[]');
-let friends=JSON.parse(localStorage.getItem('er_friends')||'[]');
-let pubData=JSON.parse(localStorage.getItem('er_public')||'[]');
-let curResult='',curStar=0,curFriends=[],curLat=null,curLng=null,curPublic=false,curFilter='all',rankSort='top';
+// ============================================================
+// ⚠️ 아래 두 줄을 본인의 Supabase 키로 교체하세요!
+const SUPABASE_URL = 'sb_publishable_KXmlnZKUWtY2lqOw8nw55A_5XUHMhLK
+';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd1dXV4emR4cnN3anpwdXNmanF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4Mjc2MTcsImV4cCI6MjA5MjQwMzYxN30.jbGQgPf1GH_RfEwU1w-HxjfpJyS1GWPEnS0Dg8GVck4
+';
+// ============================================================
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-function save(){
-  localStorage.setItem('er_records',JSON.stringify(records));
-  localStorage.setItem('er_friends',JSON.stringify(friends));
-  localStorage.setItem('er_public',JSON.stringify(pubData));
+let curUser=null, curProfile=null, records=[], myFriends=[];
+let curResult='', curStar=0, curFriends=[], curPublic=false, curFilter='all', rankSort='top';
+let posterFile=null;
+
+async function init(){
+  const {data:{session}}=await sb.auth.getSession();
+  if(session){curUser=session.user;await loadProfile();showApp();}
+}
+init();
+
+function switchTab(tab){
+  document.getElementById('login-form').style.display=tab==='login'?'block':'none';
+  document.getElementById('signup-form').style.display=tab==='signup'?'block':'none';
+  document.querySelectorAll('.auth-tab-btn').forEach((b,i)=>b.classList.toggle('active',(tab==='login'&&i===0)||(tab==='signup'&&i===1)));
 }
 
-// 데모 시드 데이터
+let previewTagNum=Math.floor(1000+Math.random()*9000);
+function previewTag(){
+  const nick=document.getElementById('signup-nick').value.trim();
+  document.getElementById('nick-preview').textContent=nick?`${nick}#${previewTagNum}`:'닉네임#????';
+}
 
+async function doSignup(){
+  const nick=document.getElementById('signup-nick').value.trim();
+  const pw=document.getElementById('signup-pw').value;
+  const pw2=document.getElementById('signup-pw2').value;
+  const msg=document.getElementById('signup-msg');
+  if(!nick){msg.className='err-msg';msg.textContent='닉네임을 입력해주세요';return;}
+  if(pw.length<6){msg.className='err-msg';msg.textContent='비밀번호는 6자 이상이어야 해요';return;}
+  if(pw!==pw2){msg.className='err-msg';msg.textContent='비밀번호가 일치하지 않아요';return;}
+  const tag=String(previewTagNum);
+  const {data:ex}=await sb.from('users').select('id').eq('nickname',nick).eq('tag',tag);
+  if(ex&&ex.length>0){previewTagNum=Math.floor(1000+Math.random()*9000);msg.className='err-msg';msg.textContent='태그 충돌! 다시 시도해주세요';return;}
+  const fakeEmail=`${nick}_${tag}@escapelog.app`;
+  const {data,error}=await sb.auth.signUp({email:fakeEmail,password:pw});
+  if(error){msg.className='err-msg';msg.textContent='가입 실패: '+error.message;return;}
+  await sb.from('users').insert({id:data.user.id,nickname:nick,tag});
+  msg.className='ok-msg';msg.textContent=`가입 완료! ${nick}#${tag} 로 로그인해주세요`;
+  switchTab('login');
+}
 
-function showPage(id,el){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('page-'+id).classList.add('active');
-  el.classList.add('active');
-  document.getElementById('main-fab').style.display=(id==='rank'||id==='stats')?'none':'flex';
-  if(id==='rank')renderRank();
-  if(id==='map')renderMap();
-  if(id==='friends')renderFriends();
-  if(id==='stats')renderStats();
+async function doLogin(){
+  const input=document.getElementById('login-nick').value.trim();
+  const pw=document.getElementById('login-pw').value;
+  const msg=document.getElementById('login-msg');
+  if(!input.includes('#')){msg.className='err-msg';msg.textContent='닉네임#태그 형식으로 입력해주세요';return;}
+  const [nick,tag]=input.split('#');
+  const {data:users}=await sb.from('users').select('*').eq('nickname',nick).eq('tag',tag);
+  if(!users||!users.length){msg.className='err-msg';msg.textContent='존재하지 않는 계정이에요';return;}
+  const fakeEmail=`${nick}_${tag}@escapelog.app`;
+  const {data,error}=await sb.auth.signInWithPassword({email:fakeEmail,password:pw});
+  if(error){msg.className='err-msg';msg.textContent='비밀번호가 틀렸어요';return;}
+  curUser=data.user;curProfile=users[0];showApp();
+}
+
+async function loadProfile(){
+  const {data}=await sb.from('users').select('*').eq('id',curUser.id).single();
+  curProfile=data;
+}
+
+async function doLogout(){
+  await sb.auth.signOut();
+  curUser=null;curProfile=null;records=[];
+  document.getElementById('main-app').style.display='none';
+  document.getElementById('auth-screen').style.display='flex';
+}
+
+function showApp(){
+  document.getElementById('auth-screen').style.display='none';
+  document.getElementById('main-app').style.display='block';
+  loadRecords();loadFriends();renderProfile();
+}
+
+function renderProfile(){
+  if(!curProfile)return;
+  const colors=['#7c6ef7','#4caf7d','#c8a96e','#e05c5c','#5bcde0'];
+  const c=colors[curProfile.nickname.charCodeAt(0)%colors.length];
+  document.getElementById('profile-card').innerHTML=`
+    <div class="profile-avatar" style="background:linear-gradient(135deg,${c},${c}88)">${curProfile.nickname[0]}</div>
+    <div><div class="profile-name">${curProfile.nickname}</div><div class="profile-tag">#${curProfile.tag}</div></div>`;
+}
+
+async function loadRecords(){
+  if(!curUser)return;
+  const {data}=await sb.from('records').select('*').eq('user_id',curUser.id).order('created_at',{ascending:false});
+  records=data||[];renderHome();
 }
 
 function setF(f,el){curFilter=f;document.querySelectorAll('#page-home .chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');renderHome();}
 
 function renderHome(){
   const q=document.getElementById('search').value.trim().toLowerCase();
-  let list=[...records].sort((a,b)=>new Date(b.date||0)-new Date(a.date||0));
-  if(q)list=list.filter(r=>(r.theme+r.cafe+(r.addr||'')).toLowerCase().includes(q));
+  let list=[...records];
+  if(q)list=list.filter(r=>(r.theme+(r.cafe||'')+(r.addr||'')).toLowerCase().includes(q));
   if(curFilter==='s')list=list.filter(r=>r.result==='s');
   if(curFilter==='f')list=list.filter(r=>r.result==='f');
-  if(curFilter==='pub')list=list.filter(r=>r.pub);
+  if(curFilter==='pub')list=list.filter(r=>r.is_public);
   if(curFilter==='5')list=list.filter(r=>r.star===5);
   document.getElementById('home-label').textContent=`기록 ${list.length}개`;
   const t=records.length,s=records.filter(r=>r.result==='s').length;
@@ -372,43 +475,39 @@ function renderHome(){
       <div class="card-top">
         <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
           <div class="card-theme">${r.theme}</div>
-          ${r.pub?`<span class="public-badge">🌍</span>`:''}
+          ${r.is_public?'<span class="public-badge">🌍</span>':''}
         </div>
         ${r.result?`<span class="badge ${r.result}">${r.result==='s'?'탈출성공':'탈출실패'}</span>`:''}
       </div>
       <div class="card-info">
         ${r.cafe?`<span>🏠 ${r.cafe}</span>`:''}
         <span>📅 ${r.date||'날짜 미입력'}${r.time?' · '+r.time:''}</span>
-        ${r.friends&&r.friends.length?`<span>👥 ${r.friends.join(', ')}</span>`:''}
+        ${r.friends?`<span>👥 ${r.friends}</span>`:''}
       </div>
       ${r.addr?`<div class="card-loc">📍 ${r.addr}</div>`:''}
       ${r.star?`<div class="stars">${'★'.repeat(r.star)}${'☆'.repeat(5-r.star)}</div>`:''}
-      ${r.reason?`<div class="reason-badge">💬 ${r.reason.slice(0,22)}${r.reason.length>22?'…':''}</div>`:''}
-      ${r.tags&&r.tags.length?`<div class="card-tags">${r.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>`:''}
+      ${r.poster_url?`<img src="${r.poster_url}" class="poster-thumb" loading="lazy"/>`:''}
+      ${r.tags?`<div class="card-tags">${r.tags.split(',').map(t=>`<span class="tag">${t.trim()}</span>`).join('')}</div>`:''}
     </div>`).join('');
 }
 
-// RANKING
 function setRF(f,el){rankSort=f;document.querySelectorAll('#page-rank .chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');renderRank();}
 
-function renderRank(){
-  // 내 공개 기록 병합
-  const myPub=records.filter(r=>r.pub&&r.star);
+async function renderRank(){
+  const {data}=await sb.from('records').select('theme,cafe,addr,star').eq('is_public',true).not('star','is',null);
   const map={};
-  pubData.forEach(p=>{const k=p.theme+'|'+p.cafe;map[k]={...p};});
-  myPub.forEach(r=>{
+  (data||[]).forEach(r=>{
     const k=r.theme+'|'+(r.cafe||'');
-    if(map[k]){map[k].count++;map[k].total+=r.star;}
-    else{map[k]={id:r.id,theme:r.theme,cafe:r.cafe||'',addr:r.addr||'',count:1,total:r.star};}
+    if(!map[k])map[k]={theme:r.theme,cafe:r.cafe||'',addr:r.addr||'',count:0,total:0};
+    map[k].count++;map[k].total+=r.star;
   });
   let list=Object.values(map).map(m=>({...m,avg:Math.round(m.total/m.count*10)/10}));
   if(rankSort==='count')list.sort((a,b)=>b.count-a.count||b.avg-a.avg);
   else list.sort((a,b)=>b.avg-a.avg||b.count-a.count);
   document.getElementById('rank-label').textContent=`총 ${list.length}개 테마`;
-  const medals=['🥇','🥈','🥉'];
-  const topCls=['top1','top2','top3'];
+  const medals=['🥇','🥈','🥉'],topCls=['top1','top2','top3'];
   const el=document.getElementById('rank-list');
-  if(!list.length){el.innerHTML='<div class="no-data" style="font-size:32px;margin-bottom:10px">🏆<br><br>아직 공개된 기록이 없어요<br>기록 추가 시 랭킹 공개를 켜보세요!</div>';return;}
+  if(!list.length){el.innerHTML='<div class="empty">아직 공개된 기록이 없어요<br>기록 추가 시 랭킹 공개를 켜보세요!</div>';return;}
   el.innerHTML=list.map((r,i)=>`
     <div class="rank-card ${topCls[i]||''}">
       <div class="rank-num">${String(i+1).padStart(2,'0')}</div>
@@ -416,37 +515,25 @@ function renderRank(){
       <div class="rank-theme">${r.theme}</div>
       ${r.addr?`<div class="rank-addr">📍 ${r.addr}</div>`:''}
       <div class="rank-bottom">
-        <div>
-          <div class="rank-stars">${starsStr(r.avg)}</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:3px">${r.cafe||''}</div>
-        </div>
-        <div style="text-align:right">
-          <div class="rank-avg">${r.avg}</div>
-          <div class="rank-count">${r.count}명 평가</div>
-        </div>
+        <div><div class="rank-stars">${starsStr(r.avg)}</div><div style="font-size:11px;color:var(--muted);margin-top:3px">${r.cafe}</div></div>
+        <div style="text-align:right"><div class="rank-avg">${r.avg}</div><div class="rank-count">${r.count}명 평가</div></div>
       </div>
     </div>`).join('');
 }
 
-function starsStr(avg){
-  const f=Math.floor(avg),h=(avg-f>=0.5?1:0),e=5-f-h;
-  return '★'.repeat(f)+(h?'½':'')+('☆'.repeat(e));
-}
+function starsStr(avg){const f=Math.floor(avg),h=(avg-f>=0.5?1:0),e=5-f-h;return '★'.repeat(f)+(h?'½':'')+('☆'.repeat(e));}
 
-// MAP
 function reqGPS(){
-  if(!navigator.geolocation){alert('위치 미지원');return;}
+  if(!navigator.geolocation)return;
   navigator.geolocation.getCurrentPosition(p=>{
     const {latitude:la,longitude:lo}=p.coords;
     document.getElementById('map-container').innerHTML=`<div style="text-align:center;color:var(--muted);font-size:13px"><div style="font-size:28px;margin-bottom:8px">📍</div><div style="font-weight:500;color:#f0ede8;margin-bottom:4px">현재 위치 확인됨</div><div style="font-family:var(--mono);font-size:11px">${la.toFixed(4)}, ${lo.toFixed(4)}</div></div>`;
-  },()=>{document.getElementById('map-container').innerHTML=`<div style="color:var(--fail);font-size:13px">위치 권한을 허용해주세요</div>`;});
+  });
 }
 function getGPS(){
   const st=document.getElementById('gps-status');st.textContent='위치 불러오는 중...';
-  if(!navigator.geolocation){st.textContent='위치 미지원';return;}
   navigator.geolocation.getCurrentPosition(p=>{
-    curLat=p.coords.latitude;curLng=p.coords.longitude;
-    document.getElementById('f-addr').value=`위도 ${curLat.toFixed(4)}, 경도 ${curLng.toFixed(4)}`;
+    document.getElementById('f-addr').value=`위도 ${p.coords.latitude.toFixed(4)}, 경도 ${p.coords.longitude.toFixed(4)}`;
     st.textContent='✓ 현재 위치 저장됨';
   },()=>{st.textContent='위치 권한을 허용해주세요';});
 }
@@ -457,25 +544,156 @@ function renderMap(){
   el.innerHTML=wl.map(r=>`<div class="pin-card"><div class="pin-dot ${r.result||'f'}"></div><div class="pin-info"><div class="pin-name">${r.theme}</div><div class="pin-addr">${r.addr}</div></div><div style="font-size:11px;color:var(--muted);font-family:var(--mono)">${r.date||''}</div></div>`).join('');
 }
 
-// FRIENDS
-function renderFriends(){
-  const el=document.getElementById('friend-list');
-  if(!friends.length){el.innerHTML='<div class="empty">친구를 추가해보세요</div>';return;}
-  const colors=['#7c6ef7','#4caf7d','#c8a96e','#e05c5c','#5bcde0','#f7a04e'];
-  el.innerHTML=friends.map((f,i)=>{
-    const pl=records.filter(r=>r.friends&&r.friends.includes(f));
-    const wo=pl.filter(r=>r.result==='s').length;
-    return `<div class="friend-card"><div class="avatar" style="background:${colors[i%colors.length]}18;color:${colors[i%colors.length]}">${f[0]}</div><div class="friend-meta"><div class="friend-name">${f}</div><div class="friend-sub">${pl.length}번 함께 · 성공 ${wo}번</div></div><div class="friend-stat">${pl.length?Math.round(wo/pl.length*100):0}%</div></div>`;
-  }).join('');
-}
-function addFriend(){
-  const v=document.getElementById('new-friend').value.trim();
-  if(!v||friends.includes(v))return;
-  friends.push(v);save();renderFriends();
-  document.getElementById('new-friend').value='';
+async function loadFriends(){
+  if(!curUser)return;
+  const {data:fs}=await sb.from('friendships').select('friend_id').eq('user_id',curUser.id);
+  if(!fs||!fs.length){myFriends=[];renderFriends([]);return;}
+  const ids=fs.map(f=>f.friend_id);
+  const {data:profiles}=await sb.from('users').select('*').in('id',ids);
+  myFriends=profiles||[];renderFriends(myFriends);
 }
 
-// STATS
+function renderFriends(list){
+  const el=document.getElementById('friend-list');
+  if(!list.length){el.innerHTML='<div class="empty">아직 친구가 없어요<br>닉네임#태그로 검색해서 추가해보세요!</div>';return;}
+  const colors=['#7c6ef7','#4caf7d','#c8a96e','#e05c5c','#5bcde0'];
+  el.innerHTML=list.map((f,i)=>`
+    <div class="friend-card">
+      <div class="avatar" style="background:${colors[i%colors.length]}18;color:${colors[i%colors.length]}">${f.nickname[0]}</div>
+      <div class="friend-meta"><div class="friend-name">${f.nickname}</div><div class="friend-sub" style="font-family:var(--mono)">#${f.tag}</div></div>
+    </div>`).join('');
+}
+
+async function searchFriend(){
+  const input=document.getElementById('friend-search').value.trim();
+  const el=document.getElementById('friend-search-result');
+  if(!input.includes('#')){el.innerHTML='<div style="font-size:12px;color:var(--fail);padding:0 0 8px">닉네임#태그 형식으로 입력해주세요</div>';return;}
+  const [nick,tag]=input.split('#');
+  const {data}=await sb.from('users').select('*').eq('nickname',nick).eq('tag',tag);
+  if(!data||!data.length){el.innerHTML='<div style="font-size:12px;color:var(--muted);padding:0 0 8px">찾을 수 없어요</div>';return;}
+  const found=data[0];
+  if(found.id===curUser.id){el.innerHTML='<div style="font-size:12px;color:var(--muted);padding:0 0 8px">본인은 추가할 수 없어요</div>';return;}
+  el.innerHTML=`<div class="search-result-card"><div><div style="font-size:14px;font-weight:500">${found.nickname}</div><div style="font-size:11px;color:var(--muted);font-family:var(--mono)">#${found.tag}</div></div><button class="add-friend-btn" onclick="addFriend('${found.id}','${found.nickname}')">+ 친구 추가</button></div>`;
+}
+
+async function addFriend(friendId,name){
+  if(myFriends.find(f=>f.id===friendId)){alert('이미 친구예요!');return;}
+  await sb.from('friendships').insert({user_id:curUser.id,friend_id:friendId});
+  document.getElementById('friend-search-result').innerHTML='';
+  document.getElementById('friend-search').value='';
+  alert(`${name} 님을 친구로 추가했어요! 🎉`);
+  loadFriends();
+}
+
+function openAdd(){
+  curResult='';curStar=0;curFriends=[];curPublic=false;posterFile=null;
+  ['f-theme','f-cafe','f-addr','f-time','f-tags','f-hint','f-memo','f-reason'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('gps-status').textContent='';
+  document.getElementById('save-msg').textContent='';
+  document.getElementById('btn-s').className='tbtn';
+  document.getElementById('btn-f').className='tbtn';
+  document.getElementById('low-box').style.display='none';
+  document.getElementById('pub-sw').className='sw';
+  document.getElementById('poster-placeholder').style.display='block';
+  document.getElementById('poster-preview-img').style.display='none';
+  document.querySelectorAll('.sbtn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('friend-chips').innerHTML=myFriends.map(f=>`<button class="fc" onclick="toggleFriend(this,'${f.nickname}#${f.tag}')">${f.nickname}</button>`).join('');
+  document.getElementById('add-overlay').style.display='flex';
+}
+function closeAdd(){document.getElementById('add-overlay').style.display='none';}
+function setResult(r){curResult=r;document.getElementById('btn-s').className='tbtn'+(r==='s'?' as':'');document.getElementById('btn-f').className='tbtn'+(r==='f'?' af':'');}
+function setStar(v){curStar=v;document.querySelectorAll('.sbtn').forEach(b=>b.classList.toggle('active',+b.dataset.v<=v));document.getElementById('low-box').style.display=(v>0&&v<=2)?'block':'none';}
+function toggleFriend(el,name){if(curFriends.includes(name)){curFriends=curFriends.filter(f=>f!==name);el.classList.remove('sel');}else{curFriends.push(name);el.classList.add('sel');}}
+function togglePublic(){curPublic=!curPublic;document.getElementById('pub-sw').className='sw'+(curPublic?' on':'');}
+
+function previewPoster(e){
+  const file=e.target.files[0];if(!file)return;
+  posterFile=file;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    document.getElementById('poster-preview-img').src=ev.target.result;
+    document.getElementById('poster-preview-img').style.display='block';
+    document.getElementById('poster-placeholder').style.display='none';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function saveRecord(){
+  const theme=document.getElementById('f-theme').value.trim();
+  const msg=document.getElementById('save-msg');
+  if(!theme){msg.className='err-msg';msg.textContent='테마 이름을 입력해주세요';return;}
+  const reason=document.getElementById('f-reason').value.trim();
+  if(curStar>0&&curStar<=2&&!reason){msg.className='err-msg';msg.textContent='⚠️ 2점 이하는 사유를 입력해주세요';return;}
+  msg.className='ok-msg';msg.textContent='저장 중...';
+  let posterUrl=null;
+  if(posterFile){
+    const ext=posterFile.name.split('.').pop();
+    const path=`${curUser.id}/${Date.now()}.${ext}`;
+    const {data:up}=await sb.storage.from('posters').upload(path,posterFile);
+    if(up){const {data:url}=sb.storage.from('posters').getPublicUrl(path);posterUrl=url.publicUrl;}
+  }
+  const rec={
+    user_id:curUser.id,theme,
+    cafe:document.getElementById('f-cafe').value.trim()||null,
+    addr:document.getElementById('f-addr').value.trim()||null,
+    date:document.getElementById('f-date').value||null,
+    result:curResult||null,time:document.getElementById('f-time').value.trim()||null,
+    friends:curFriends.length?curFriends.join(', '):null,
+    tags:document.getElementById('f-tags').value.trim()||null,
+    star:curStar||null,hint:document.getElementById('f-hint').value.trim()||null,
+    memo:document.getElementById('f-memo').value.trim()||null,
+    reason:reason||null,is_public:curPublic,poster_url:posterUrl,
+  };
+  const {error}=await sb.from('records').insert(rec);
+  if(error){msg.className='err-msg';msg.textContent='저장 실패: '+error.message;return;}
+  msg.className='ok-msg';msg.textContent='✓ 저장됐어요!';
+  setTimeout(()=>{closeAdd();loadRecords();},800);
+}
+
+async function openDetail(id){
+  const r=records.find(x=>x.id===id);if(!r)return;
+  const stars=r.star?'★'.repeat(r.star)+'☆'.repeat(5-r.star):'-';
+  document.getElementById('detail-sheet').innerHTML=`
+    <div class="handle"></div>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+      <div class="modal-title" style="margin:0">${r.theme}</div>
+      ${r.is_public?'<span class="public-badge">🌍 공개</span>':''}
+    </div>
+    ${r.result?`<div style="display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:20px;margin:10px 0 14px;font-size:12px;font-weight:500;background:${r.result==='s'?'rgba(76,175,125,0.12)':'rgba(224,92,92,0.12)'};color:${r.result==='s'?'var(--success)':'var(--fail)'}">${r.result==='s'?'🏆 탈출 성공':'💀 탈출 실패'}</div>`:''}
+    ${r.poster_url?`<img src="${r.poster_url}" style="width:100%;border-radius:12px;margin-bottom:14px;max-height:220px;object-fit:cover"/>`:''}
+    <div class="detail-row"><span class="detail-key">카페</span><span>${r.cafe||'-'}</span></div>
+    <div class="detail-row"><span class="detail-key">위치</span><span style="color:var(--accent2)">${r.addr||'-'}</span></div>
+    <div class="detail-row"><span class="detail-key">날짜</span><span>${r.date||'-'}</span></div>
+    <div class="detail-row"><span class="detail-key">시간</span><span>${r.time||'-'}</span></div>
+    <div class="detail-row"><span class="detail-key">함께한 친구</span><span>${r.friends||'-'}</span></div>
+    <div class="detail-row"><span class="detail-key">힌트</span><span>${r.hint||'-'}</span></div>
+    <div class="detail-row"><span class="detail-key">별점</span><span style="color:var(--accent);font-family:var(--mono)">${stars}</span></div>
+    ${r.reason?`<div class="detail-row"><span class="detail-key">낮은 별점 사유</span><span style="color:#ff9a9a;font-size:12px;text-align:right;max-width:60%">${r.reason}</span></div>`:''}
+    ${r.tags?`<div style="display:flex;gap:5px;flex-wrap:wrap;padding:10px 0;border-bottom:0.5px solid rgba(255,255,255,0.05)">${r.tags.split(',').map(t=>`<span class="tag">${t.trim()}</span>`).join('')}</div>`:''}
+    ${r.memo?`<div class="memo-box">🔒 ${r.memo}</div>`:''}
+    <button class="delete-btn" onclick="delRecord('${r.id}')">이 기록 삭제</button>
+    <button class="cancel-btn" onclick="closeDetail()">닫기</button>`;
+  document.getElementById('detail-overlay').style.display='flex';
+}
+function closeDetail(){document.getElementById('detail-overlay').style.display='none';}
+async function delRecord(id){
+  if(!confirm('삭제할까요?'))return;
+  await sb.from('records').delete().eq('id',id);
+  records=records.filter(r=>r.id!==id);renderHome();closeDetail();
+}
+
+function showPage(id,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');el.classList.add('active');
+  document.getElementById('main-fab').style.display=(id==='rank'||id==='profile')?'none':'flex';
+  if(id==='rank')renderRank();
+  if(id==='map')renderMap();
+  if(id==='friends')loadFriends();
+  if(id==='profile'){renderProfile();renderStats();}
+}
+
 function renderStats(){
   const months=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
   const now=new Date(),mData=[];
@@ -487,108 +705,12 @@ function renderStats(){
   const max=Math.max(...mData.map(m=>m.cnt),1);
   document.getElementById('month-chart').innerHTML=mData.map(m=>`<div class="bar-row"><div class="bar-label">${m.label}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(m.cnt/max*100)}%;background:linear-gradient(90deg,var(--accent2),var(--accent))"></div></div><div class="bar-val">${m.cnt}</div></div>`).join('');
   const gm={};
-  records.forEach(r=>(r.tags||[]).forEach(t=>{gm[t]=(gm[t]||0)+1;}));
+  records.forEach(r=>(r.tags||'').split(',').map(t=>t.trim()).filter(Boolean).forEach(t=>{gm[t]=(gm[t]||0)+1;}));
   const genres=Object.entries(gm).sort((a,b)=>b[1]-a[1]).slice(0,6);
   document.getElementById('genre-chart').innerHTML=genres.length?genres.map(([g,c])=>`<div class="genre-item"><div class="genre-name">${g}</div><div class="genre-count">${c}</div></div>`).join(''):'<div style="color:var(--muted);font-size:12px;padding:8px">장르 태그를 추가하면 보여요</div>';
   const top=records.filter(r=>r.star).sort((a,b)=>b.star-a.star).slice(0,3);
   document.getElementById('top-themes').innerHTML=top.length?top.map((r,i)=>`<div style="display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:0.5px solid rgba(255,255,255,0.05)"><div style="font-size:18px;width:24px;text-align:center">${['🥇','🥈','🥉'][i]}</div><div style="flex:1"><div style="font-size:14px;font-weight:500">${r.theme}</div><div style="font-size:11px;color:var(--muted)">${r.cafe||''}</div></div><div style="color:var(--accent);font-family:var(--mono);font-size:12px">${'★'.repeat(r.star)}</div></div>`).join(''):'<div style="color:var(--muted);font-size:12px;padding:8px">별점을 추가하면 보여요</div>';
 }
-
-// ADD MODAL
-function openAdd(){
-  curResult='';curStar=0;curFriends=[];curLat=null;curLng=null;curPublic=false;
-  ['f-theme','f-cafe','f-addr','f-time','f-tags','f-hint','f-memo','f-reason'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
-  document.getElementById('gps-status').textContent='';
-  document.getElementById('btn-s').className='tbtn';
-  document.getElementById('btn-f').className='tbtn';
-  document.getElementById('low-box').style.display='none';
-  document.getElementById('pub-sw').className='sw';
-  document.querySelectorAll('.sbtn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('friend-chips').innerHTML=friends.map(f=>`<button class="fc" onclick="toggleFriend(this,'${f}')">${f}</button>`).join('');
-  document.getElementById('add-overlay').style.display='flex';
-}
-function closeAdd(){document.getElementById('add-overlay').style.display='none';}
-function setResult(r){curResult=r;document.getElementById('btn-s').className='tbtn'+(r==='s'?' as':'');document.getElementById('btn-f').className='tbtn'+(r==='f'?' af':'');}
-function setStar(v){
-  curStar=v;
-  document.querySelectorAll('.sbtn').forEach(b=>b.classList.toggle('active',+b.dataset.v<=v));
-  document.getElementById('low-box').style.display=(v>0&&v<=2)?'block':'none';
-}
-function toggleFriend(el,name){
-  if(curFriends.includes(name)){curFriends=curFriends.filter(f=>f!==name);el.classList.remove('sel');}
-  else{curFriends.push(name);el.classList.add('sel');}
-}
-function togglePublic(){
-  curPublic=!curPublic;
-  document.getElementById('pub-sw').className='sw'+(curPublic?' on':'');
-}
-
-function saveRecord(){
-  const theme=document.getElementById('f-theme').value.trim();
-  if(!theme){alert('테마 이름을 입력해주세요');return;}
-  const reason=document.getElementById('f-reason').value.trim();
-  if(curStar>0&&curStar<=2&&!reason){
-    alert('⚠️ 2점 이하는 사유를 입력해주세요');
-    document.getElementById('f-reason').focus();return;
-  }
-  const tags=(document.getElementById('f-tags').value||'').split(',').map(t=>t.trim()).filter(Boolean);
-  const rec={
-    id:Date.now().toString(),theme,
-    cafe:document.getElementById('f-cafe').value.trim(),
-    addr:document.getElementById('f-addr').value.trim(),
-    lat:curLat,lng:curLng,
-    date:document.getElementById('f-date').value,
-    result:curResult,time:document.getElementById('f-time').value.trim(),
-    friends:[...curFriends],tags,star:curStar,
-    hint:document.getElementById('f-hint').value.trim(),
-    memo:document.getElementById('f-memo').value.trim(),
-    reason,pub:curPublic,
-  };
-  records.unshift(rec);
-  if(curPublic&&curStar){
-    const k=theme+'|'+(rec.cafe||'');
-    const ex=pubData.find(p=>p.theme+'|'+(p.cafe||'')===k);
-    if(ex){ex.count++;ex.total+=curStar;}
-    else pubData.push({id:rec.id,theme,cafe:rec.cafe,addr:rec.addr,count:1,total:curStar});
-  }
-  save();renderHome();closeAdd();
-}
-
-// DETAIL
-function openDetail(id){
-  const r=records.find(x=>x.id===id);if(!r)return;
-  const stars=r.star?'★'.repeat(r.star)+'☆'.repeat(5-r.star):'-';
-  document.getElementById('detail-sheet').innerHTML=`
-    <div class="handle"></div>
-    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
-      <div class="modal-title" style="margin:0">${r.theme}</div>
-      ${r.pub?`<span class="public-badge">🌍 공개</span>`:''}
-    </div>
-    ${r.result?`<div style="display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:20px;margin:10px 0 14px;font-size:12px;font-weight:500;background:${r.result==='s'?'rgba(76,175,125,0.12)':'rgba(224,92,92,0.12)'};color:${r.result==='s'?'var(--success)':'var(--fail)'}">${r.result==='s'?'🏆 탈출 성공':'💀 탈출 실패'}</div>`:'<div style="margin-top:10px"></div>'}
-    <div class="detail-row"><span class="detail-key">카페</span><span>${r.cafe||'-'}</span></div>
-    <div class="detail-row"><span class="detail-key">위치</span><span style="color:var(--accent2)">${r.addr||'-'}</span></div>
-    <div class="detail-row"><span class="detail-key">날짜</span><span>${r.date||'-'}</span></div>
-    <div class="detail-row"><span class="detail-key">시간</span><span>${r.time||'-'}</span></div>
-    <div class="detail-row"><span class="detail-key">함께한 친구</span><span>${r.friends&&r.friends.length?r.friends.join(', '):'-'}</span></div>
-    <div class="detail-row"><span class="detail-key">힌트</span><span>${r.hint||'-'}</span></div>
-    <div class="detail-row"><span class="detail-key">별점</span><span style="color:var(--accent);font-family:var(--mono)">${stars}</span></div>
-    ${r.reason?`<div class="detail-row"><span class="detail-key">낮은 별점 사유</span><span style="color:#ff9a9a;font-size:12px;text-align:right;max-width:60%">${r.reason}</span></div>`:''}
-    ${r.tags&&r.tags.length?`<div style="display:flex;gap:5px;flex-wrap:wrap;padding:10px 0;border-bottom:0.5px solid rgba(255,255,255,0.05)">${r.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>`:''}
-    ${r.memo?`<div class="memo-box">🔒 ${r.memo}</div>`:''}
-    <button class="delete-btn" onclick="delRecord('${r.id}')">이 기록 삭제</button>
-    <button class="cancel-btn" onclick="closeDetail()">닫기</button>
-  `;
-  document.getElementById('detail-overlay').style.display='flex';
-}
-function closeDetail(){document.getElementById('detail-overlay').style.display='none';}
-function delRecord(id){
-  if(!confirm('삭제할까요?'))return;
-  records=records.filter(r=>r.id!==id);
-  save();renderHome();closeDetail();
-}
-
-renderHome();
 </script>
 </body>
 </html>
