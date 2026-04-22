@@ -363,12 +363,9 @@ input:focus,select:focus,textarea:focus{border-color:rgba(200,169,110,0.35)}
     const { createClient } = supabase;
     const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // [복구] 지도 관련 변수
-    let map = null;
-    let marker = null;
-    let selectedPlace = { lat: null, lng: null, name: "" };
+    window.map = null;
 
-    // 2. 로그인 함수 (onclick="doLogin()"과 연결)
+    // [로그인 기능]
     window.doLogin = async () => {
         const combinedNick = document.getElementById('login-nick').value; 
         const password = document.getElementById('login-pw').value;
@@ -383,69 +380,55 @@ input:focus,select:focus,textarea:focus{border-color:rgba(200,169,110,0.35)}
             });
             if (error) throw error;
 
-            alert(`${nickname}님, 반갑습니다!`);
+            alert(`${nickname}님, 환영합니다!`);
             document.getElementById('auth-screen').style.display = 'none';
             document.getElementById('main-app').style.display = 'block';
 
-            // 로그인 후 기존 기능들 로드
+            // 메인 기능들 로드 (기존 기능 복구)
             setTimeout(() => {
-                window.initKakaoMap(); // 지도 초기화
-                if (typeof renderStats === 'function') renderStats();
-                if (typeof renderRankings === 'function') renderRankings();
-                if (typeof renderHistory === 'function') renderHistory();
-            }, 100);
+                if (typeof window.initMap === 'function') window.initMap(); 
+                if (typeof window.renderStats === 'function') window.renderStats();
+                if (typeof window.renderRankings === 'function') window.renderRankings();
+                if (typeof window.renderHistory === 'function') window.renderHistory();
+            }, 200);
 
         } catch (err) {
             alert("로그인 실패: " + err.message);
         }
     };
 
-    // 3. [복구] 카카오맵 초기화 및 기능
-    window.initKakaoMap = () => {
-        const mapContainer = document.getElementById('map'); 
-        if (!mapContainer) return;
+    // [회원가입 기능]
+    window.signup = async () => {
+        const nickname = document.getElementById('signup-nickname').value;
+        const pw = document.getElementById('signup-password').value;
+        const pwConfirm = document.getElementById('signup-password-confirm').value;
 
-        const mapOption = { center: new kakao.maps.LatLng(37.5665, 126.9780), level: 3 };
-        map = new kakao.maps.Map(mapContainer, mapOption);
-        marker = new kakao.maps.Marker({ position: map.getCenter() });
-        marker.setMap(map);
+        if (!nickname || pw.length < 6) return alert("닉네임 입력 및 비밀번호 6자 이상 필수!");
+        if (pw !== pwConfirm) return alert("비밀번호가 일치하지 않습니다.");
 
-        // 지도를 클릭했을 때 위치 잡기
-        kakao.maps.event.addListener(map, 'click', function(mouseEvent) {
-            const latlng = mouseEvent.getLatLng();
-            marker.setPosition(latlng);
-            selectedPlace.lat = latlng.getLat();
-            selectedPlace.lng = latlng.getLng();
-        });
-    };
-
-    // 4. [복구] 기록 저장 (지도 좌표 포함)
-    window.saveLog = async () => {
-        const theme = document.getElementById('theme-input').value;
-        const shop = document.getElementById('shop-input').value;
+        const randomTag = Math.floor(1000 + Math.random() * 9000).toString();
+        const email = `user${randomTag}@test.com`;
 
         try {
-            const { data: { user } } = await _supabase.auth.getUser();
-            const { error } = await _supabase.from('escape_logs').insert([{
-                user_id: user.id,
-                theme_name: theme,
-                shop_name: shop,
-                lat: selectedPlace.lat,
-                lng: selectedPlace.lng,
-                created_at: new Date()
-            }]);
+            const { error: authError } = await _supabase.auth.signUp({
+                email: email, password: pw,
+                options: { data: { nickname: nickname, tag: randomTag } }
+            });
+            if (authError) throw authError;
 
-            if (error) throw error;
-            alert("지점 위치와 함께 기록되었습니다!");
-            if (typeof renderHistory === 'function') renderHistory();
+            await _supabase.from('users').insert([{ nickname: nickname, tag: randomTag }]);
+            alert(`가입 성공! ${nickname}#${randomTag}\n이 정보로 로그인하세요.`);
+            location.reload();
         } catch (err) {
-            alert("저장 실패: " + err.message);
+            alert("가입 오류: " + err.message);
         }
     };
 
-    // 5. 친구 추가 (friendships 테이블)
-    window.addFriend = async () => {
-        const input = document.getElementById('friend-nickname-input').value;
+    // [친구 추가 기능]
+    window.searchFriend = async () => {
+        const input = document.getElementById('friend-search').value; // ID 수정함
+        if (!input.includes('#')) return alert("닉네임#태그 형식으로 입력해주세요!");
+        
         const [fNick, fTag] = input.split('#');
 
         try {
@@ -453,17 +436,30 @@ input:focus,select:focus,textarea:focus{border-color:rgba(200,169,110,0.35)}
             if (!fUser) throw new Error("친구를 찾을 수 없습니다.");
             
             const { data: { user } } = await _supabase.auth.getUser();
-            await _supabase.from('friendships').insert([{ user_id: user.id, friend_id: fUser.id }]);
+            const { error } = await _supabase.from('friendships').insert([{ user_id: user.id, friend_id: fUser.id }]);
+
+            if (error) throw error;
             alert(`${fNick}님과 친구가 되었습니다!`);
         } catch (err) {
             alert("친구 추가 실패: " + err.message);
         }
     };
 
-    // 회원가입 및 탭 전환 (기존 유지)
+    // [회원가입 버튼에 기능 연결]
     document.addEventListener('DOMContentLoaded', () => {
-        // 회원가입 버튼 이벤트 등 기존 코드가 여기에 위치합니다.
+        const signupBtn = document.getElementById('real-signup-btn');
+        if (signupBtn) {
+            signupBtn.onclick = window.signup; // 버튼 클릭 시 가입 함수 실행
+        }
     });
+
+    window.switchTab = (type) => {
+        document.getElementById('login-form').style.display = type === 'signup' ? 'none' : 'block';
+        document.getElementById('signup-form').style.display = type === 'signup' ? 'block' : 'none';
+        const tabs = document.querySelectorAll('.auth-tab-btn');
+        tabs[0].classList.toggle('active', type !== 'signup');
+        tabs[1].classList.toggle('active', type === 'signup');
+    };
 </script>
 </body>
 </html>
