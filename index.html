@@ -102,8 +102,8 @@ body{font-family:'Noto Sans KR',sans-serif;background:#0a0a10;color:#f0ede8;min-
 .modal-title{font-size:18px;font-weight:900;margin-bottom:4px;letter-spacing:-0.3px}
 .modal-sub{font-size:12px;color:var(--muted);margin-bottom:20px;line-height:1.5}
 label{display:block;font-size:10px;color:var(--muted);margin-bottom:5px;margin-top:16px;letter-spacing:0.8px;text-transform:uppercase;font-family:var(--mono)}
-input[type=text],input[type=date],input[type=password],select,textarea{width:100%;background:var(--surface2);border:0.5px solid rgba(255,255,255,0.08);border-radius:12px;padding:11px 14px;color:#f0ede8;font-size:14px;font-family:'Noto Sans KR',sans-serif;outline:none;transition:border-color 0.2s}
-input:focus,select:focus,textarea:focus{border-color:rgba(200,169,110,0.35)}
+input[type=text],input[type=date],input[type=password],textarea{width:100%;background:var(--surface2);border:0.5px solid rgba(255,255,255,0.08);border-radius:12px;padding:11px 14px;color:#f0ede8;font-size:14px;font-family:'Noto Sans KR',sans-serif;outline:none;transition:border-color 0.2s}
+input:focus,textarea:focus{border-color:rgba(200,169,110,0.35)}
 .toggle-row{display:flex;gap:8px;margin-top:6px}
 .tbtn{flex:1;padding:11px;border-radius:12px;border:0.5px solid rgba(255,255,255,0.08);background:var(--surface2);color:var(--muted);font-size:13px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:all 0.15s}
 .tbtn.as{background:rgba(76,175,125,0.15);border-color:rgba(76,175,125,0.4);color:var(--success);font-weight:500}
@@ -157,8 +157,7 @@ input:focus,select:focus,textarea:focus{border-color:rgba(200,169,110,0.35)}
 .poster-upload input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
 .poster-preview-img{width:100%;border-radius:10px;margin-top:8px;max-height:200px;object-fit:cover}
 .friend-search-row{display:flex;gap:8px;padding:0 16px;margin-bottom:8px}
-.search-result{padding:0 16px;display:flex;flex-direction:column;gap:8px}
-.search-result-card{background:var(--surface2);border:0.5px solid var(--border);border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between}
+.search-result-card{background:var(--surface2);border:0.5px solid var(--border);border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;margin:0 16px}
 .add-friend-btn{padding:7px 14px;background:rgba(124,110,247,0.2);color:#c4bfff;border:0.5px solid var(--border2);border-radius:10px;font-size:12px;cursor:pointer;font-family:'Noto Sans KR',sans-serif}
 .loading{text-align:center;padding:20px;color:var(--muted);font-size:13px}
 </style>
@@ -177,23 +176,23 @@ input:focus,select:focus,textarea:focus{border-color:rgba(200,169,110,0.35)}
     </div>
     <div id="login-form">
       <label>닉네임#태그</label>
-      <input type="text" id="login-nick" placeholder="닉네임#1234"/>
+      <input type="text" id="login-nick" placeholder="디디#1234"/>
       <label>비밀번호</label>
       <input type="password" id="login-pw" placeholder="비밀번호 입력"/>
       <div id="login-msg"></div>
       <button class="submit-btn" style="margin-top:16px" onclick="doLogin()">로그인</button>
     </div>
-<div id="signup-form" style="display:none">
-  <label>닉네임</label>
-  <input type="text" id="signup-nickname" placeholder="원하는 닉네임 입력" oninput="previewTag()"/>
-  <div class="nick-preview" id="nick-preview">닉네임#????</div>
-  <label>비밀번호</label>
-  <input type="password" id="signup-password" placeholder="비밀번호 (6자 이상)"/>
-  <label>비밀번호 확인</label>
-  <input type="password" id="signup-password-confirm" placeholder="비밀번호 재입력"/>
-  <div id="signup-msg"></div>
-  <button class="submit-btn" id="real-signup-btn" style="margin-top:16px">가입하기</button>
-</div>
+    <div id="signup-form" style="display:none">
+      <label>닉네임</label>
+      <input type="text" id="signup-nick" placeholder="원하는 닉네임 입력" oninput="previewTag()"/>
+      <div class="nick-preview" id="nick-preview">닉네임#????</div>
+      <label>비밀번호</label>
+      <input type="password" id="signup-pw" placeholder="비밀번호 (6자 이상)"/>
+      <label>비밀번호 확인</label>
+      <input type="password" id="signup-pw2" placeholder="비밀번호 재입력"/>
+      <div id="signup-msg"></div>
+      <button class="submit-btn" style="margin-top:16px" onclick="doSignup()">가입하기</button>
+    </div>
   </div>
 </div>
 
@@ -266,7 +265,7 @@ input:focus,select:focus,textarea:focus{border-color:rgba(200,169,110,0.35)}
     <input type="text" id="friend-search" placeholder="닉네임#태그 (예: 디디#1234)" style="flex:1"/>
     <button onclick="searchFriend()" style="padding:11px 16px;background:rgba(124,110,247,0.18);color:#c4bfff;border:0.5px solid var(--border2);border-radius:12px;font-size:13px;cursor:pointer;font-family:'Noto Sans KR',sans-serif">검색</button>
   </div>
-  <div class="search-result" id="friend-search-result"></div>
+  <div id="friend-search-result"></div>
   <div class="sec" style="margin-top:8px">내 친구들</div>
   <div class="friend-list" id="friend-list"><div class="loading">불러오는 중...</div></div>
 </div>
@@ -303,7 +302,7 @@ input:focus,select:focus,textarea:focus{border-color:rgba(200,169,110,0.35)}
   </div>
   <div style="font-size:11px;color:var(--muted);margin-top:4px" id="gps-status"></div>
   <label>포스터 / 인증샷</label>
-  <div class="poster-upload" id="poster-drop">
+  <div class="poster-upload">
     <input type="file" id="poster-file" accept="image/*" onchange="previewPoster(event)"/>
     <div id="poster-placeholder"><div style="font-size:24px;margin-bottom:6px">🖼</div><div style="font-size:12px;color:var(--muted)">사진을 탭해서 업로드</div></div>
     <img id="poster-preview-img" class="poster-preview-img" style="display:none"/>
@@ -355,111 +354,440 @@ input:focus,select:focus,textarea:focus{border-color:rgba(200,169,110,0.35)}
 <div class="sheet" id="detail-sheet"></div>
 </div>
 
-<script type="module">
-    // 1. Supabase 설정
-    const SUPABASE_URL = 'https://guuuxzdxrswjzpusfjqw.supabase.co'; 
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd1dXV4emR4cnN3anpwdXNmanF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4Mjc2MTcsImV4cCI6MjA5MjQwMzYxN30.jbGQgPf1GH_RfEwU1w-HxjfpJyS1GWPEnS0Dg8GVck4';
+<script>
+// ============================================================
+// ⚠️ 아래 두 줄을 본인의 Supabase 키로 교체하세요!
+const SUPABASE_URL = '여기에_Project_URL_붙여넣기';
+const SUPABASE_KEY = '여기에_새_Publishable_key_붙여넣기';
+// ============================================================
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    const { createClient } = supabase;
-    const _supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+let curUser=null, curProfile=null, records=[], myFriends=[];
+let curResult='', curStar=0, curFriends=[], curPublic=false, curFilter='all', rankSort='top';
+let posterFile=null, previewTagNum=Math.floor(1000+Math.random()*9000);
 
-    window.map = null;
+// 초기화
+async function init(){
+  const {data:{session}}=await sb.auth.getSession();
+  if(session){curUser=session.user;await loadProfile();showApp();}
+}
+init();
 
-    // [로그인 기능]
-    window.doLogin = async () => {
-        const combinedNick = document.getElementById('login-nick').value; 
-        const password = document.getElementById('login-pw').value;
+// AUTH
+function switchTab(tab){
+  document.getElementById('login-form').style.display=tab==='login'?'block':'none';
+  document.getElementById('signup-form').style.display=tab==='signup'?'block':'none';
+  document.querySelectorAll('.auth-tab-btn').forEach((b,i)=>b.classList.toggle('active',(tab==='login'&&i===0)||(tab==='signup'&&i===1)));
+}
 
-        if (!combinedNick.includes('#')) return alert("닉네임#태그 형식으로 입력해주세요!");
-        const [nickname, tag] = combinedNick.split('#');
-        const email = `user${tag}@test.com`; 
+function previewTag(){
+  const nick=document.getElementById('signup-nick').value.trim();
+  document.getElementById('nick-preview').textContent=nick?nick+'#'+previewTagNum:'닉네임#????';
+}
 
-        try {
-            const { data, error } = await _supabase.auth.signInWithPassword({
-                email: email, password: password
-            });
-            if (error) throw error;
+async function doSignup(){
+  const nick=document.getElementById('signup-nick').value.trim();
+  const pw=document.getElementById('signup-pw').value;
+  const pw2=document.getElementById('signup-pw2').value;
+  const msg=document.getElementById('signup-msg');
+  if(!nick){msg.className='err-msg';msg.textContent='닉네임을 입력해주세요';return;}
+  if(pw.length<6){msg.className='err-msg';msg.textContent='비밀번호는 6자 이상이어야 해요';return;}
+  if(pw!==pw2){msg.className='err-msg';msg.textContent='비밀번호가 일치하지 않아요';return;}
+  const tag=String(previewTagNum);
+  const fakeEmail=nick+'_'+tag+'@escapelog.app';
+  const {data,error}=await sb.auth.signUp({email:fakeEmail,password:pw});
+  if(error){msg.className='err-msg';msg.textContent='가입 실패: '+error.message;return;}
+  await sb.from('users').insert({id:data.user.id,nickname:nick,tag:tag});
+  msg.className='ok-msg';msg.textContent='가입 완료! '+nick+'#'+tag+' 로 로그인해주세요';
+  switchTab('login');
+}
 
-            alert(`${nickname}님, 환영합니다!`);
-            document.getElementById('auth-screen').style.display = 'none';
-            document.getElementById('main-app').style.display = 'block';
+async function doLogin(){
+  const input=document.getElementById('login-nick').value.trim();
+  const pw=document.getElementById('login-pw').value;
+  const msg=document.getElementById('login-msg');
+  if(!input.includes('#')){msg.className='err-msg';msg.textContent='닉네임#태그 형식으로 입력해주세요';return;}
+  const parts=input.split('#');
+  const nick=parts[0], tag=parts[1];
+  const {data:users}=await sb.from('users').select('*').eq('nickname',nick).eq('tag',tag);
+  if(!users||!users.length){msg.className='err-msg';msg.textContent='존재하지 않는 계정이에요';return;}
+  const fakeEmail=nick+'_'+tag+'@escapelog.app';
+  const {data,error}=await sb.auth.signInWithPassword({email:fakeEmail,password:pw});
+  if(error){msg.className='err-msg';msg.textContent='비밀번호가 틀렸어요';return;}
+  curUser=data.user;curProfile=users[0];showApp();
+}
 
-            // 메인 기능들 로드 (기존 기능 복구)
-            setTimeout(() => {
-                if (typeof window.initMap === 'function') window.initMap(); 
-                if (typeof window.renderStats === 'function') window.renderStats();
-                if (typeof window.renderRankings === 'function') window.renderRankings();
-                if (typeof window.renderHistory === 'function') window.renderHistory();
-            }, 200);
+async function loadProfile(){
+  const {data}=await sb.from('users').select('*').eq('id',curUser.id).single();
+  if(data)curProfile=data;
+}
 
-        } catch (err) {
-            alert("로그인 실패: " + err.message);
-        }
-    };
+async function doLogout(){
+  await sb.auth.signOut();
+  curUser=null;curProfile=null;records=[];myFriends=[];
+  document.getElementById('main-app').style.display='none';
+  document.getElementById('auth-screen').style.display='flex';
+}
 
-    // [회원가입 기능]
-    window.signup = async () => {
-        const nickname = document.getElementById('signup-nickname').value;
-        const pw = document.getElementById('signup-password').value;
-        const pwConfirm = document.getElementById('signup-password-confirm').value;
+function showApp(){
+  document.getElementById('auth-screen').style.display='none';
+  document.getElementById('main-app').style.display='block';
+  loadRecords();
+  loadFriends();
+  renderProfile();
+}
 
-        if (!nickname || pw.length < 6) return alert("닉네임 입력 및 비밀번호 6자 이상 필수!");
-        if (pw !== pwConfirm) return alert("비밀번호가 일치하지 않습니다.");
+// 페이지 전환
+function showPage(id,el){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.nav-btn').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('page-'+id).classList.add('active');
+  el.classList.add('active');
+  document.getElementById('main-fab').style.display=(id==='rank'||id==='profile')?'none':'flex';
+  if(id==='rank')renderRank();
+  if(id==='map')renderMap();
+  if(id==='friends')loadFriends();
+  if(id==='profile'){renderProfile();renderStats();}
+}
 
-        const randomTag = Math.floor(1000 + Math.random() * 9000).toString();
-        const email = `user${randomTag}@test.com`;
+// PROFILE
+function renderProfile(){
+  if(!curProfile)return;
+  var colors=['#7c6ef7','#4caf7d','#c8a96e','#e05c5c','#5bcde0'];
+  var c=colors[curProfile.nickname.charCodeAt(0)%colors.length];
+  document.getElementById('profile-card').innerHTML=
+    '<div class="profile-avatar" style="background:linear-gradient(135deg,'+c+','+c+'88)">'+curProfile.nickname[0]+'</div>'+
+    '<div><div class="profile-name">'+curProfile.nickname+'</div><div class="profile-tag">#'+curProfile.tag+'</div></div>';
+}
 
-        try {
-            const { error: authError } = await _supabase.auth.signUp({
-                email: email, password: pw,
-                options: { data: { nickname: nickname, tag: randomTag } }
-            });
-            if (authError) throw authError;
+// HOME
+async function loadRecords(){
+  if(!curUser)return;
+  var res=await sb.from('records').select('*').eq('user_id',curUser.id).order('created_at',{ascending:false});
+  records=res.data||[];
+  renderHome();
+}
 
-            await _supabase.from('users').insert([{ nickname: nickname, tag: randomTag }]);
-            alert(`가입 성공! ${nickname}#${randomTag}\n이 정보로 로그인하세요.`);
-            location.reload();
-        } catch (err) {
-            alert("가입 오류: " + err.message);
-        }
-    };
+function setF(f,el){
+  curFilter=f;
+  document.querySelectorAll('#page-home .chip').forEach(function(c){c.classList.remove('active');});
+  el.classList.add('active');
+  renderHome();
+}
 
-    // [친구 추가 기능]
-    window.searchFriend = async () => {
-        const input = document.getElementById('friend-search').value; // ID 수정함
-        if (!input.includes('#')) return alert("닉네임#태그 형식으로 입력해주세요!");
-        
-        const [fNick, fTag] = input.split('#');
+function renderHome(){
+  var q=document.getElementById('search').value.trim().toLowerCase();
+  var list=records.slice();
+  if(q)list=list.filter(function(r){return (r.theme+(r.cafe||'')+(r.addr||'')).toLowerCase().indexOf(q)>=0;});
+  if(curFilter==='s')list=list.filter(function(r){return r.result==='s';});
+  if(curFilter==='f')list=list.filter(function(r){return r.result==='f';});
+  if(curFilter==='pub')list=list.filter(function(r){return r.is_public;});
+  if(curFilter==='5')list=list.filter(function(r){return r.star===5;});
+  document.getElementById('home-label').textContent='기록 '+list.length+'개';
+  var t=records.length, s=records.filter(function(r){return r.result==='s';}).length;
+  document.getElementById('s-total').textContent=t;
+  document.getElementById('s-esc').textContent=s;
+  document.getElementById('s-rate').textContent=t?Math.round(s/t*100)+'%':'0%';
+  var el=document.getElementById('record-list');
+  if(!list.length){el.innerHTML='<div class="empty">아직 기록이 없어요<br>첫 방탈출을 추가해보세요! 🔐</div>';return;}
+  el.innerHTML=list.map(function(r){
+    return '<div class="card result-'+(r.result||'none')+'" onclick="openDetail(\''+r.id+'\')">'+
+      '<div class="card-top">'+
+        '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">'+
+          '<div class="card-theme">'+r.theme+'</div>'+
+          (r.is_public?'<span class="public-badge">🌍</span>':'')+
+        '</div>'+
+        (r.result?'<span class="badge '+r.result+'">'+(r.result==='s'?'탈출성공':'탈출실패')+'</span>':'')+
+      '</div>'+
+      '<div class="card-info">'+
+        (r.cafe?'<span>🏠 '+r.cafe+'</span>':'')+
+        '<span>📅 '+(r.date||'날짜 미입력')+(r.time?' · '+r.time:'')+'</span>'+
+        (r.friends?'<span>👥 '+r.friends+'</span>':'')+
+      '</div>'+
+      (r.addr?'<div class="card-loc">📍 '+r.addr+'</div>':'')+
+      (r.star?'<div class="stars">'+'★'.repeat(r.star)+'☆'.repeat(5-r.star)+'</div>':'')+
+      (r.poster_url?'<img src="'+r.poster_url+'" class="poster-thumb" loading="lazy"/>':'')+
+      (r.tags?'<div class="card-tags">'+r.tags.split(',').map(function(t){return '<span class="tag">'+t.trim()+'</span>';}).join('')+'</div>':'')+
+    '</div>';
+  }).join('');
+}
 
-        try {
-            const { data: fUser } = await _supabase.from('users').select('id').eq('nickname', fNick).eq('tag', fTag).single();
-            if (!fUser) throw new Error("친구를 찾을 수 없습니다.");
-            
-            const { data: { user } } = await _supabase.auth.getUser();
-            const { error } = await _supabase.from('friendships').insert([{ user_id: user.id, friend_id: fUser.id }]);
+// RANKING
+function setRF(f,el){
+  rankSort=f;
+  document.querySelectorAll('#page-rank .chip').forEach(function(c){c.classList.remove('active');});
+  el.classList.add('active');
+  renderRank();
+}
 
-            if (error) throw error;
-            alert(`${fNick}님과 친구가 되었습니다!`);
-        } catch (err) {
-            alert("친구 추가 실패: " + err.message);
-        }
-    };
+async function renderRank(){
+  var el=document.getElementById('rank-list');
+  el.innerHTML='<div class="loading">불러오는 중...</div>';
+  var res=await sb.from('records').select('theme,cafe,addr,star').eq('is_public',true).not('star','is',null);
+  var map={};
+  (res.data||[]).forEach(function(r){
+    var k=r.theme+'|'+(r.cafe||'');
+    if(!map[k])map[k]={theme:r.theme,cafe:r.cafe||'',addr:r.addr||'',count:0,total:0};
+    map[k].count++;map[k].total+=r.star;
+  });
+  var list=Object.values(map).map(function(m){return Object.assign({},m,{avg:Math.round(m.total/m.count*10)/10});});
+  if(rankSort==='count')list.sort(function(a,b){return b.count-a.count||b.avg-a.avg;});
+  else list.sort(function(a,b){return b.avg-a.avg||b.count-a.count;});
+  document.getElementById('rank-label').textContent='총 '+list.length+'개 테마';
+  var medals=['🥇','🥈','🥉'];
+  var topCls=['top1','top2','top3'];
+  if(!list.length){el.innerHTML='<div class="empty">아직 공개된 기록이 없어요<br>기록 추가 시 랭킹 공개를 켜보세요!</div>';return;}
+  el.innerHTML=list.map(function(r,i){
+    return '<div class="rank-card '+(topCls[i]||'')+'">'+
+      '<div class="rank-num">'+String(i+1).padStart(2,'0')+'</div>'+
+      (i<3?'<div class="rank-medal">'+medals[i]+'</div>':'<div style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:6px">#'+(i+1)+'</div>')+
+      '<div class="rank-theme">'+r.theme+'</div>'+
+      (r.addr?'<div class="rank-addr">📍 '+r.addr+'</div>':'')+
+      '<div class="rank-bottom">'+
+        '<div><div class="rank-stars">'+starsStr(r.avg)+'</div><div style="font-size:11px;color:var(--muted);margin-top:3px">'+r.cafe+'</div></div>'+
+        '<div style="text-align:right"><div class="rank-avg">'+r.avg+'</div><div class="rank-count">'+r.count+'명 평가</div></div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
 
-    // [회원가입 버튼에 기능 연결]
-    document.addEventListener('DOMContentLoaded', () => {
-        const signupBtn = document.getElementById('real-signup-btn');
-        if (signupBtn) {
-            signupBtn.onclick = window.signup; // 버튼 클릭 시 가입 함수 실행
-        }
-    });
+function starsStr(avg){
+  var f=Math.floor(avg),h=(avg-f>=0.5?1:0),e=5-f-h;
+  return '★'.repeat(f)+(h?'½':'')+'☆'.repeat(e);
+}
 
-    window.switchTab = (type) => {
-        document.getElementById('login-form').style.display = type === 'signup' ? 'none' : 'block';
-        document.getElementById('signup-form').style.display = type === 'signup' ? 'block' : 'none';
-        const tabs = document.querySelectorAll('.auth-tab-btn');
-        tabs[0].classList.toggle('active', type !== 'signup');
-        tabs[1].classList.toggle('active', type === 'signup');
-    };
+// MAP
+function reqGPS(){
+  if(!navigator.geolocation)return;
+  navigator.geolocation.getCurrentPosition(function(p){
+    var la=p.coords.latitude,lo=p.coords.longitude;
+    document.getElementById('map-container').innerHTML=
+      '<div style="text-align:center;color:var(--muted);font-size:13px">'+
+      '<div style="font-size:28px;margin-bottom:8px">📍</div>'+
+      '<div style="font-weight:500;color:#f0ede8;margin-bottom:4px">현재 위치 확인됨</div>'+
+      '<div style="font-family:var(--mono);font-size:11px">'+la.toFixed(4)+', '+lo.toFixed(4)+'</div></div>';
+  });
+}
+
+function getGPS(){
+  var st=document.getElementById('gps-status');
+  st.textContent='위치 불러오는 중...';
+  navigator.geolocation.getCurrentPosition(function(p){
+    document.getElementById('f-addr').value='위도 '+p.coords.latitude.toFixed(4)+', 경도 '+p.coords.longitude.toFixed(4);
+    st.textContent='✓ 현재 위치 저장됨';
+  },function(){st.textContent='위치 권한을 허용해주세요';});
+}
+
+function renderMap(){
+  var wl=records.filter(function(r){return r.addr;});
+  var el=document.getElementById('pin-list');
+  if(!wl.length){el.innerHTML='<div class="empty">위치 정보가 있는 기록이 없어요</div>';return;}
+  el.innerHTML=wl.map(function(r){
+    return '<div class="pin-card">'+
+      '<div class="pin-dot '+(r.result||'f')+'"></div>'+
+      '<div class="pin-info"><div class="pin-name">'+r.theme+'</div><div class="pin-addr">'+r.addr+'</div></div>'+
+      '<div style="font-size:11px;color:var(--muted);font-family:var(--mono)">'+(r.date||'')+'</div>'+
+    '</div>';
+  }).join('');
+}
+
+// FRIENDS
+async function loadFriends(){
+  if(!curUser)return;
+  var res=await sb.from('friendships').select('friend_id').eq('user_id',curUser.id);
+  if(!res.data||!res.data.length){myFriends=[];renderFriends([]);return;}
+  var ids=res.data.map(function(f){return f.friend_id;});
+  var res2=await sb.from('users').select('*').in('id',ids);
+  myFriends=res2.data||[];
+  renderFriends(myFriends);
+}
+
+function renderFriends(list){
+  var el=document.getElementById('friend-list');
+  if(!list.length){el.innerHTML='<div class="empty">아직 친구가 없어요<br>닉네임#태그로 검색해서 추가해보세요!</div>';return;}
+  var colors=['#7c6ef7','#4caf7d','#c8a96e','#e05c5c','#5bcde0'];
+  el.innerHTML=list.map(function(f,i){
+    return '<div class="friend-card">'+
+      '<div class="avatar" style="background:'+colors[i%colors.length]+'18;color:'+colors[i%colors.length]+'">'+f.nickname[0]+'</div>'+
+      '<div class="friend-meta"><div class="friend-name">'+f.nickname+'</div><div class="friend-sub" style="font-family:var(--mono)">#'+f.tag+'</div></div>'+
+    '</div>';
+  }).join('');
+}
+
+async function searchFriend(){
+  var input=document.getElementById('friend-search').value.trim();
+  var el=document.getElementById('friend-search-result');
+  if(!input.includes('#')){el.innerHTML='<div style="font-size:12px;color:var(--fail);padding:8px 16px">닉네임#태그 형식으로 입력해주세요</div>';return;}
+  var parts=input.split('#');
+  var nick=parts[0],tag=parts[1];
+  var res=await sb.from('users').select('*').eq('nickname',nick).eq('tag',tag);
+  if(!res.data||!res.data.length){el.innerHTML='<div style="font-size:12px;color:var(--muted);padding:8px 16px">찾을 수 없어요</div>';return;}
+  var found=res.data[0];
+  if(found.id===curUser.id){el.innerHTML='<div style="font-size:12px;color:var(--muted);padding:8px 16px">본인은 추가할 수 없어요</div>';return;}
+  el.innerHTML='<div class="search-result-card">'+
+    '<div><div style="font-size:14px;font-weight:500">'+found.nickname+'</div>'+
+    '<div style="font-size:11px;color:var(--muted);font-family:var(--mono)">#'+found.tag+'</div></div>'+
+    '<button class="add-friend-btn" onclick="addFriend(\''+found.id+'\',\''+found.nickname+'\')">+ 친구 추가</button>'+
+  '</div>';
+}
+
+async function addFriend(friendId,name){
+  if(myFriends.find(function(f){return f.id===friendId;})){alert('이미 친구예요!');return;}
+  await sb.from('friendships').insert({user_id:curUser.id,friend_id:friendId});
+  document.getElementById('friend-search-result').innerHTML='';
+  document.getElementById('friend-search').value='';
+  alert(name+' 님을 친구로 추가했어요! 🎉');
+  loadFriends();
+}
+
+// ADD MODAL
+function openAdd(){
+  curResult='';curStar=0;curFriends=[];curPublic=false;posterFile=null;
+  ['f-theme','f-cafe','f-addr','f-time','f-tags','f-hint','f-memo','f-reason'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('gps-status').textContent='';
+  document.getElementById('save-msg').textContent='';
+  document.getElementById('btn-s').className='tbtn';
+  document.getElementById('btn-f').className='tbtn';
+  document.getElementById('low-box').style.display='none';
+  document.getElementById('pub-sw').className='sw';
+  document.getElementById('poster-placeholder').style.display='block';
+  document.getElementById('poster-preview-img').style.display='none';
+  document.querySelectorAll('.sbtn').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('friend-chips').innerHTML=myFriends.map(function(f){
+    return '<button class="fc" onclick="toggleFriend(this,\''+f.nickname+'#'+f.tag+'\')">'+f.nickname+'</button>';
+  }).join('');
+  document.getElementById('add-overlay').style.display='flex';
+}
+function closeAdd(){document.getElementById('add-overlay').style.display='none';}
+function setResult(r){
+  curResult=r;
+  document.getElementById('btn-s').className='tbtn'+(r==='s'?' as':'');
+  document.getElementById('btn-f').className='tbtn'+(r==='f'?' af':'');
+}
+function setStar(v){
+  curStar=v;
+  document.querySelectorAll('.sbtn').forEach(function(b){b.classList.toggle('active',+b.dataset.v<=v);});
+  document.getElementById('low-box').style.display=(v>0&&v<=2)?'block':'none';
+}
+function toggleFriend(el,name){
+  if(curFriends.indexOf(name)>=0){curFriends=curFriends.filter(function(f){return f!==name;});el.classList.remove('sel');}
+  else{curFriends.push(name);el.classList.add('sel');}
+}
+function togglePublic(){curPublic=!curPublic;document.getElementById('pub-sw').className='sw'+(curPublic?' on':'');}
+
+function previewPoster(e){
+  var file=e.target.files[0];if(!file)return;
+  posterFile=file;
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    document.getElementById('poster-preview-img').src=ev.target.result;
+    document.getElementById('poster-preview-img').style.display='block';
+    document.getElementById('poster-placeholder').style.display='none';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function saveRecord(){
+  var theme=document.getElementById('f-theme').value.trim();
+  var msg=document.getElementById('save-msg');
+  if(!theme){msg.className='err-msg';msg.textContent='테마 이름을 입력해주세요';return;}
+  var reason=document.getElementById('f-reason').value.trim();
+  if(curStar>0&&curStar<=2&&!reason){msg.className='err-msg';msg.textContent='⚠️ 2점 이하는 사유를 입력해주세요';return;}
+  msg.className='ok-msg';msg.textContent='저장 중...';
+  var posterUrl=null;
+  if(posterFile){
+    var ext=posterFile.name.split('.').pop();
+    var path=curUser.id+'/'+Date.now()+'.'+ext;
+    var up=await sb.storage.from('posters').upload(path,posterFile);
+    if(up.data){var urlRes=sb.storage.from('posters').getPublicUrl(path);posterUrl=urlRes.data.publicUrl;}
+  }
+  var rec={
+    user_id:curUser.id,
+    theme:theme,
+    cafe:document.getElementById('f-cafe').value.trim()||null,
+    addr:document.getElementById('f-addr').value.trim()||null,
+    date:document.getElementById('f-date').value||null,
+    result:curResult||null,
+    time:document.getElementById('f-time').value.trim()||null,
+    friends:curFriends.length?curFriends.join(', '):null,
+    tags:document.getElementById('f-tags').value.trim()||null,
+    star:curStar||null,
+    hint:document.getElementById('f-hint').value.trim()||null,
+    memo:document.getElementById('f-memo').value.trim()||null,
+    reason:reason||null,
+    is_public:curPublic,
+    poster_url:posterUrl
+  };
+  var res=await sb.from('records').insert(rec);
+  if(res.error){msg.className='err-msg';msg.textContent='저장 실패: '+res.error.message;return;}
+  msg.className='ok-msg';msg.textContent='✓ 저장됐어요!';
+  setTimeout(function(){closeAdd();loadRecords();},800);
+}
+
+// DETAIL
+async function openDetail(id){
+  var r=records.find(function(x){return x.id===id;});if(!r)return;
+  var stars=r.star?'★'.repeat(r.star)+'☆'.repeat(5-r.star):'-';
+  document.getElementById('detail-sheet').innerHTML=
+    '<div class="handle"></div>'+
+    '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">'+
+      '<div class="modal-title" style="margin:0">'+r.theme+'</div>'+
+      (r.is_public?'<span class="public-badge">🌍 공개</span>':'')+
+    '</div>'+
+    (r.result?'<div style="display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:20px;margin:10px 0 14px;font-size:12px;font-weight:500;background:'+(r.result==='s'?'rgba(76,175,125,0.12)':'rgba(224,92,92,0.12)')+';color:'+(r.result==='s'?'var(--success)':'var(--fail)')+';">'+(r.result==='s'?'🏆 탈출 성공':'💀 탈출 실패')+'</div>':'')+
+    (r.poster_url?'<img src="'+r.poster_url+'" style="width:100%;border-radius:12px;margin-bottom:14px;max-height:220px;object-fit:cover"/>':'')+
+    '<div class="detail-row"><span class="detail-key">카페</span><span>'+(r.cafe||'-')+'</span></div>'+
+    '<div class="detail-row"><span class="detail-key">위치</span><span style="color:var(--accent2)">'+(r.addr||'-')+'</span></div>'+
+    '<div class="detail-row"><span class="detail-key">날짜</span><span>'+(r.date||'-')+'</span></div>'+
+    '<div class="detail-row"><span class="detail-key">시간</span><span>'+(r.time||'-')+'</span></div>'+
+    '<div class="detail-row"><span class="detail-key">함께한 친구</span><span>'+(r.friends||'-')+'</span></div>'+
+    '<div class="detail-row"><span class="detail-key">힌트</span><span>'+(r.hint||'-')+'</span></div>'+
+    '<div class="detail-row"><span class="detail-key">별점</span><span style="color:var(--accent);font-family:var(--mono)">'+stars+'</span></div>'+
+    (r.reason?'<div class="detail-row"><span class="detail-key">낮은 별점 사유</span><span style="color:#ff9a9a;font-size:12px;text-align:right;max-width:60%">'+r.reason+'</span></div>':'')+
+    (r.tags?'<div style="display:flex;gap:5px;flex-wrap:wrap;padding:10px 0;border-bottom:0.5px solid rgba(255,255,255,0.05)">'+r.tags.split(',').map(function(t){return '<span class="tag">'+t.trim()+'</span>';}).join('')+'</div>':'')+
+    (r.memo?'<div class="memo-box">🔒 '+r.memo+'</div>':'')+
+    '<button class="delete-btn" onclick="delRecord(\''+r.id+'\')">이 기록 삭제</button>'+
+    '<button class="cancel-btn" onclick="closeDetail()">닫기</button>';
+  document.getElementById('detail-overlay').style.display='flex';
+}
+function closeDetail(){document.getElementById('detail-overlay').style.display='none';}
+async function delRecord(id){
+  if(!confirm('삭제할까요?'))return;
+  await sb.from('records').delete().eq('id',id);
+  records=records.filter(function(r){return r.id!==id;});
+  renderHome();closeDetail();
+}
+
+// STATS
+function renderStats(){
+  var months=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+  var now=new Date(),mData=[];
+  for(var i=5;i>=0;i--){
+    var d=new Date(now.getFullYear(),now.getMonth()-i,1);
+    var key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+    mData.push({label:months[d.getMonth()],cnt:records.filter(function(r){return r.date&&r.date.startsWith(key);}).length});
+  }
+  var max=Math.max.apply(null,mData.map(function(m){return m.cnt;}).concat([1]));
+  document.getElementById('month-chart').innerHTML=mData.map(function(m){
+    return '<div class="bar-row"><div class="bar-label">'+m.label+'</div>'+
+      '<div class="bar-track"><div class="bar-fill" style="width:'+Math.round(m.cnt/max*100)+'%;background:linear-gradient(90deg,var(--accent2),var(--accent))"></div></div>'+
+      '<div class="bar-val">'+m.cnt+'</div></div>';
+  }).join('');
+  var gm={};
+  records.forEach(function(r){(r.tags||'').split(',').map(function(t){return t.trim();}).filter(Boolean).forEach(function(t){gm[t]=(gm[t]||0)+1;});});
+  var genres=Object.entries(gm).sort(function(a,b){return b[1]-a[1];}).slice(0,6);
+  document.getElementById('genre-chart').innerHTML=genres.length?genres.map(function(g){
+    return '<div class="genre-item"><div class="genre-name">'+g[0]+'</div><div class="genre-count">'+g[1]+'</div></div>';
+  }).join(''):'<div style="color:var(--muted);font-size:12px;padding:8px">장르 태그를 추가하면 보여요</div>';
+  var top=records.filter(function(r){return r.star;}).sort(function(a,b){return b.star-a.star;}).slice(0,3);
+  document.getElementById('top-themes').innerHTML=top.length?top.map(function(r,i){
+    return '<div style="display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:0.5px solid rgba(255,255,255,0.05)">'+
+      '<div style="font-size:18px;width:24px;text-align:center">'+['🥇','🥈','🥉'][i]+'</div>'+
+      '<div style="flex:1"><div style="font-size:14px;font-weight:500">'+r.theme+'</div><div style="font-size:11px;color:var(--muted)">'+(r.cafe||'')+'</div></div>'+
+      '<div style="color:var(--accent);font-family:var(--mono);font-size:12px">'+'★'.repeat(r.star)+'</div></div>';
+  }).join(''):'<div style="color:var(--muted);font-size:12px;padding:8px">별점을 추가하면 보여요</div>';
+}
 </script>
 </body>
 </html>
