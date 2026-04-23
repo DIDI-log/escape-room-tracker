@@ -176,7 +176,7 @@ input:focus,textarea:focus{border-color:rgba(200,169,110,0.35)}
     </div>
     <div id="login-form">
       <label>닉네임#태그</label>
-      <input type="text" id="login-nick" placeholder="디디#1234"/>
+      <input type="text" id="login-nick" placeholder="닉네임#1234"/>
       <label>비밀번호</label>
       <input type="password" id="login-pw" placeholder="비밀번호 입력"/>
       <div id="login-msg"></div>
@@ -262,7 +262,7 @@ input:focus,textarea:focus{border-color:rgba(200,169,110,0.35)}
 <div id="page-friends" class="page">
   <div class="sec">친구 검색</div>
   <div class="friend-search-row">
-    <input type="text" id="friend-search" placeholder="닉네임#태그 (예: 디디#1234)" style="flex:1"/>
+    <input type="text" id="friend-search" placeholder="닉네임#태그 (예: 닉네임#1234)" style="flex:1"/>
     <button onclick="searchFriend()" style="padding:11px 16px;background:rgba(124,110,247,0.18);color:#c4bfff;border:0.5px solid var(--border2);border-radius:12px;font-size:13px;cursor:pointer;font-family:'Noto Sans KR',sans-serif">검색</button>
   </div>
   <div id="friend-search-result"></div>
@@ -357,8 +357,8 @@ input:focus,textarea:focus{border-color:rgba(200,169,110,0.35)}
 <script>
 // ============================================================
 // ⚠️ 아래 두 줄을 본인의 Supabase 키로 교체하세요!
-const SUPABASE_URL = '여기에_Project_URL_붙여넣기';
-const SUPABASE_KEY = '여기에_새_Publishable_key_붙여넣기';
+const SUPABASE_URL = 'https://guuuxzdxrswjzpusfjqw.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd1dXV4emR4cnN3anpwdXNmanF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4Mjc2MTcsImV4cCI6MjA5MjQwMzYxN30.jbGQgPf1GH_RfEwU1w-HxjfpJyS1GWPEnS0Dg8GVck4';
 // ============================================================
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
